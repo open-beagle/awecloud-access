@@ -1,3 +1,6 @@
+workspace:
+  path: src/github.com/fatedier/frp
+
 clone:
   git:
     image: registry-vpc.cn-qingdao.aliyuncs.com/wod-devops/git:1.4.0
