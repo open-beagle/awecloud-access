@@ -18,7 +18,7 @@ pipeline:
       - /var/run/docker.sock:/var/run/docker.sock    
     base: registry-vpc.cn-qingdao.aliyuncs.com/wod/alpine-glibc:3.9
     dockerfile: build/server.dockerfile
-    repo: cloud/awecloud-access-server
+    repo: wod-cloud/awecloud-access-server
     version: 0.27.0
     channel: alpha
     registry: registry-vpc.cn-qingdao.aliyuncs.com
@@ -35,7 +35,7 @@ pipeline:
       - /var/run/docker.sock:/var/run/docker.sock    
     base: registry-vpc.cn-qingdao.aliyuncs.com/wod/alpine-glibc:3.9
     dockerfile: build/server.dockerfile
-    repo: cloud/awecloud-access-server
+    repo: wod-cloud/awecloud-access-server
     version: 0.27.0
     registry: registry-vpc.cn-qingdao.aliyuncs.com
     secrets: 
