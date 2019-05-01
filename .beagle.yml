@@ -46,3 +46,43 @@ pipeline:
         target: REGISTRY_PASSWORD    
     when:
       branch: master
+
+  build-client:
+    image: registry-vpc.cn-qingdao.aliyuncs.com/wod-devops/go:1.11.5-stretch
+    binary: awecloud-access-client
+    main: cmd/frpc
+
+  docker-client-alpha:
+    image: registry-vpc.cn-qingdao.aliyuncs.com/wod-devops/docker:1.0
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock    
+    base: registry-vpc.cn-qingdao.aliyuncs.com/wod/alpine-glibc:3.9
+    dockerfile: build/client.dockerfile
+    repo: wod-cloud/awecloud-access-client
+    version: 0.27.0
+    channel: alpha
+    registry: registry-vpc.cn-qingdao.aliyuncs.com
+    secrets: 
+      - source: REGISTRY_USER_ALIYUN
+        target: REGISTRY_USER
+      - source: REGISTRY_PASSWORD_ALIYUN
+        target: REGISTRY_PASSWORD    
+    when:
+      branch: dev
+
+  docker-client:
+    image: registry-vpc.cn-qingdao.aliyuncs.com/wod-devops/docker:1.0
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock    
+    base: registry-vpc.cn-qingdao.aliyuncs.com/wod/alpine-glibc:3.9
+    dockerfile: build/client.dockerfile
+    repo: wod-cloud/awecloud-access-client
+    version: 0.27.0
+    registry: registry-vpc.cn-qingdao.aliyuncs.com
+    secrets: 
+      - source: REGISTRY_USER_ALIYUN
+        target: REGISTRY_USER
+      - source: REGISTRY_PASSWORD_ALIYUN
+        target: REGISTRY_PASSWORD    
+    when:
+      branch: master      
