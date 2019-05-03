@@ -47,6 +47,7 @@ pipeline:
     when:
       branch: master
 
+
   build-client:
     image: registry-vpc.cn-qingdao.aliyuncs.com/wod-devops/go:1.11.5-stretch
     binary: awecloud-access-client
