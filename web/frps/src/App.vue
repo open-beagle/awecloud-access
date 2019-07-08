@@ -2,7 +2,7 @@
     <div id="app">
         <header class="grid-content header-color">
             <el-row>
-                <a class="brand" href="#">frp</a>
+                <a class="brand" href="#">Beagle Cloud Access Server</a>
             </el-row>
         </header>
         <section>
