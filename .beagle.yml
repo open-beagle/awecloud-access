@@ -19,7 +19,7 @@ pipeline:
     base: registry-vpc.cn-qingdao.aliyuncs.com/wod/alpine-glibc:3.10
     dockerfile: build/server.dockerfile
     repo: wod-cloud/awecloud-access-server
-    version: 0.27.0
+    version: "0.31.2"
     channel: alpha
     registry: registry-vpc.cn-qingdao.aliyuncs.com
     secrets: 
@@ -37,7 +37,7 @@ pipeline:
     base: registry-vpc.cn-qingdao.aliyuncs.com/wod/alpine-glibc:3.10
     dockerfile: build/server.dockerfile
     repo: wod-cloud/awecloud-access-server
-    version: 0.27.0
+    version: "0.31.2"
     registry: registry-vpc.cn-qingdao.aliyuncs.com
     secrets: 
       - source: REGISTRY_USER_ALIYUN
@@ -60,7 +60,7 @@ pipeline:
     base: registry-vpc.cn-qingdao.aliyuncs.com/wod/alpine-glibc:3.10
     dockerfile: build/client.dockerfile
     repo: wod-cloud/awecloud-access-client
-    version: 0.27.0
+    version: "0.31.2"
     channel: alpha
     registry: registry-vpc.cn-qingdao.aliyuncs.com
     secrets: 
@@ -78,7 +78,7 @@ pipeline:
     base: registry-vpc.cn-qingdao.aliyuncs.com/wod/alpine-glibc:3.10
     dockerfile: build/client.dockerfile
     repo: wod-cloud/awecloud-access-client
-    version: 0.27.0
+    version: "0.31.2"
     registry: registry-vpc.cn-qingdao.aliyuncs.com
     secrets: 
       - source: REGISTRY_USER_ALIYUN
