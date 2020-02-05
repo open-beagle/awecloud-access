@@ -3,12 +3,12 @@ workspace:
 
 clone:
   git:
-    image: registry-vpc.cn-qingdao.aliyuncs.com/wod-devops/git:1.4.0
+    image: registry-vpc.cn-qingdao.aliyuncs.com/wod-devops/git:1.5.0
 
 pipeline:
 
   build-server:
-    image: registry-vpc.cn-qingdao.aliyuncs.com/wod-devops/go:1.11.5-stretch
+    image: registry-vpc.cn-qingdao.aliyuncs.com/wod-devops/go:1.13.5-stretch
     binary: awecloud-access-server
     main: cmd/frps
 
@@ -16,7 +16,7 @@ pipeline:
     image: registry-vpc.cn-qingdao.aliyuncs.com/wod-devops/docker:1.0
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock    
-    base: registry-vpc.cn-qingdao.aliyuncs.com/wod/alpine-glibc:3.9
+    base: registry-vpc.cn-qingdao.aliyuncs.com/wod/alpine-glibc:3.10
     dockerfile: build/server.dockerfile
     repo: wod-cloud/awecloud-access-server
     version: 0.27.0
@@ -34,7 +34,7 @@ pipeline:
     image: registry-vpc.cn-qingdao.aliyuncs.com/wod-devops/docker:1.0
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock    
-    base: registry-vpc.cn-qingdao.aliyuncs.com/wod/alpine-glibc:3.9
+    base: registry-vpc.cn-qingdao.aliyuncs.com/wod/alpine-glibc:3.10
     dockerfile: build/server.dockerfile
     repo: wod-cloud/awecloud-access-server
     version: 0.27.0
@@ -49,7 +49,7 @@ pipeline:
 
 
   build-client:
-    image: registry-vpc.cn-qingdao.aliyuncs.com/wod-devops/go:1.11.5-stretch
+    image: registry-vpc.cn-qingdao.aliyuncs.com/wod-devops/go:1.13.5-stretch
     binary: awecloud-access-client
     main: cmd/frpc
 
@@ -57,7 +57,7 @@ pipeline:
     image: registry-vpc.cn-qingdao.aliyuncs.com/wod-devops/docker:1.0
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock    
-    base: registry-vpc.cn-qingdao.aliyuncs.com/wod/alpine-glibc:3.9
+    base: registry-vpc.cn-qingdao.aliyuncs.com/wod/alpine-glibc:3.10
     dockerfile: build/client.dockerfile
     repo: wod-cloud/awecloud-access-client
     version: 0.27.0
@@ -75,7 +75,7 @@ pipeline:
     image: registry-vpc.cn-qingdao.aliyuncs.com/wod-devops/docker:1.0
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock    
-    base: registry-vpc.cn-qingdao.aliyuncs.com/wod/alpine-glibc:3.9
+    base: registry-vpc.cn-qingdao.aliyuncs.com/wod/alpine-glibc:3.10
     dockerfile: build/client.dockerfile
     repo: wod-cloud/awecloud-access-client
     version: 0.27.0
