@@ -1,6 +1,7 @@
-FROM {{ BASEIMAGE }}
-MAINTAINER {{ AUTHOR }}
-LABEL Author={{ AUTHOR }} Name={{ PROJECT }} Version={{ VERSION }}
+ARG BASE
+
+FROM $BASE
+LABEL maintainer={{AUTHOR}} version={{VERSION}}
 
 COPY ./dist/awecloud-access-client /app/awecloud-access-client
 COPY ./build/client.conf.ini /etc/awecloud/conf.ini

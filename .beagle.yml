@@ -8,82 +8,73 @@ clone:
 pipeline:
 
   build-server:
-    image: registry-vpc.cn-qingdao.aliyuncs.com/wod-devops/go:1.13.5-stretch
+    image: registry-vpc.cn-qingdao.aliyuncs.com/wod-devops/go:1.13.8-stretch
     binary: awecloud-access-server
     main: cmd/frps
 
   docker-server-alpha:
     image: registry-vpc.cn-qingdao.aliyuncs.com/wod-devops/docker:1.0
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock    
+      - /var/run/docker.sock:/var/run/docker.sock
     base: registry-vpc.cn-qingdao.aliyuncs.com/wod/alpine-glibc:3.10
     dockerfile: build/server.dockerfile
-    repo: wod-cloud/awecloud-access-server
-    version: "0.31.2"
+    repo: wod/awecloud-access-server
+    version: "0.32.1"
     channel: alpha
     registry: registry-vpc.cn-qingdao.aliyuncs.com
     secrets: 
       - source: REGISTRY_USER_ALIYUN
         target: REGISTRY_USER
       - source: REGISTRY_PASSWORD_ALIYUN
-        target: REGISTRY_PASSWORD    
-    when:
-      branch: dev
+        target: REGISTRY_PASSWORD
 
-  docker-server:
-    image: registry-vpc.cn-qingdao.aliyuncs.com/wod-devops/docker:1.0
+  harbor-server:
+    image: registry.cn-qingdao.aliyuncs.com/wod-devops/harbor:1.0
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock    
-    base: registry-vpc.cn-qingdao.aliyuncs.com/wod/alpine-glibc:3.10
-    dockerfile: build/server.dockerfile
-    repo: wod-cloud/awecloud-access-server
-    version: "0.31.2"
+      - /var/run/docker.sock:/var/run/docker.sock
+    repo: wod/awecloud-access-server
+    tag: "0.32.1"
     registry: registry-vpc.cn-qingdao.aliyuncs.com
     secrets: 
       - source: REGISTRY_USER_ALIYUN
         target: REGISTRY_USER
       - source: REGISTRY_PASSWORD_ALIYUN
-        target: REGISTRY_PASSWORD    
+        target: REGISTRY_PASSWORD
     when:
       branch: master
 
-
   build-client:
-    image: registry-vpc.cn-qingdao.aliyuncs.com/wod-devops/go:1.13.5-stretch
+    image: registry-vpc.cn-qingdao.aliyuncs.com/wod-devops/go:1.13.8-stretch
     binary: awecloud-access-client
     main: cmd/frpc
 
   docker-client-alpha:
     image: registry-vpc.cn-qingdao.aliyuncs.com/wod-devops/docker:1.0
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock    
-    base: registry-vpc.cn-qingdao.aliyuncs.com/wod/alpine-glibc:3.10
+      - /var/run/docker.sock:/var/run/docker.sock
     dockerfile: build/client.dockerfile
-    repo: wod-cloud/awecloud-access-client
-    version: "0.31.2"
+    base: registry-vpc.cn-qingdao.aliyuncs.com/wod/alpine-glibc:3.10
+    repo: wod/awecloud-access-client
+    version: "0.32.1"
     channel: alpha
     registry: registry-vpc.cn-qingdao.aliyuncs.com
     secrets: 
       - source: REGISTRY_USER_ALIYUN
         target: REGISTRY_USER
       - source: REGISTRY_PASSWORD_ALIYUN
-        target: REGISTRY_PASSWORD    
-    when:
-      branch: dev
+        target: REGISTRY_PASSWORD
 
-  docker-client:
-    image: registry-vpc.cn-qingdao.aliyuncs.com/wod-devops/docker:1.0
+  harbor-client:
+    image: registry.cn-qingdao.aliyuncs.com/wod-devops/harbor:1.0
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock    
-    base: registry-vpc.cn-qingdao.aliyuncs.com/wod/alpine-glibc:3.10
-    dockerfile: build/client.dockerfile
-    repo: wod-cloud/awecloud-access-client
-    version: "0.31.2"
+      - /var/run/docker.sock:/var/run/docker.sock
+    repo: wod/awecloud-access-client
+    tag: "0.32.1"
     registry: registry-vpc.cn-qingdao.aliyuncs.com
     secrets: 
       - source: REGISTRY_USER_ALIYUN
         target: REGISTRY_USER
       - source: REGISTRY_PASSWORD_ALIYUN
-        target: REGISTRY_PASSWORD    
+        target: REGISTRY_PASSWORD
     when:
-      branch: master      
+      branch: master
