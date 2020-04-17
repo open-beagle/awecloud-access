@@ -158,11 +158,6 @@ func parseClientCommonCfgFromCmd() (cfg config.ClientCommonConf, err error) {
 		return
 	}
 
-	servPath := os.Getenv("SERVER_PATH")
-	if len(servPath) > 0 {
-		unet.FrpWebsocketPath = servPath
-	}
-
 	cfg.User = user
 	cfg.Protocol = protocol
 	cfg.LogLevel = logLevel
@@ -187,6 +182,11 @@ func runClient(cfgFilePath string) (err error) {
 	content, err = config.GetRenderedConfFromFile(cfgFilePath)
 	if err != nil {
 		return
+	}
+
+	servPath := os.Getenv("SERVER_PATH")
+	if len(servPath) > 0 {
+		unet.FrpWebsocketPath = servPath
 	}
 
 	cfg, err := parseClientCommonCfg(CfgFileTypeIni, content)

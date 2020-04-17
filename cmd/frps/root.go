@@ -131,6 +131,11 @@ func Execute() {
 }
 
 func parseServerCommonCfg(fileType int, content string) (cfg config.ServerCommonConf, err error) {
+	servPath := os.Getenv("SERVER_PATH")
+	if len(servPath) > 0 {
+		unet.FrpWebsocketPath = servPath
+	}
+
 	if fileType == CfgFileTypeIni {
 		cfg, err = parseServerCommonCfgFromIni(content)
 	} else if fileType == CfgFileTypeCmd {
@@ -157,11 +162,6 @@ func parseServerCommonCfgFromIni(content string) (config.ServerCommonConf, error
 
 func parseServerCommonCfgFromCmd() (cfg config.ServerCommonConf, err error) {
 	cfg = config.GetDefaultServerConf()
-
-	servPath := os.Getenv("SERVER_PATH")
-	if len(servPath) > 0 {
-		unet.FrpWebsocketPath = servPath
-	}
 
 	cfg.BindAddr = bindAddr
 	cfg.BindPort = bindPort
