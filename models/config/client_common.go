@@ -33,6 +33,9 @@ type ClientCommonConf struct {
 	// ServerAddr specifies the address of the server to connect to. By
 	// default, this value is "0.0.0.0".
 	ServerAddr string `json:"server_addr"`
+	// ServerPath specifies the address of the server to connect to. By
+	// default, this value is "".
+	ServerPath string `json:"server_path"`
 	// ServerPort specifies the port to connect to the server on. By default,
 	// this value is 7000.
 	ServerPort int `json:"server_port"`
@@ -165,6 +168,10 @@ func UnmarshalClientConfFromIni(content string) (cfg ClientCommonConf, err error
 	)
 	if tmpStr, ok = conf.Get("common", "server_addr"); ok {
 		cfg.ServerAddr = tmpStr
+	}
+
+	if tmpStr, ok = conf.Get("common", "server_path"); ok {
+		cfg.ServerPath = tmpStr
 	}
 
 	if tmpStr, ok = conf.Get("common", "server_port"); ok {

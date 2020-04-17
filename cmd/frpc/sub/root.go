@@ -184,14 +184,14 @@ func runClient(cfgFilePath string) (err error) {
 		return
 	}
 
-	servPath := os.Getenv("SERVER_PATH")
-	if len(servPath) > 0 {
-		unet.FrpWebsocketPath = servPath
-	}
-
 	cfg, err := parseClientCommonCfg(CfgFileTypeIni, content)
 	if err != nil {
 		return
+	}
+
+	servPath := cfg.ServerPath
+	if len(servPath) > 0 {
+		unet.FrpWebsocketPath = servPath
 	}
 
 	pxyCfgs, visitorCfgs, err := config.LoadAllConfFromIni(cfg.User, content, cfg.Start)
