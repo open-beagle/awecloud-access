@@ -1,3 +1,5 @@
+platform: 10.11.92.33
+
 workspace:
   path: src/github.com/fatedier/frp
 
