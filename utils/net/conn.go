@@ -222,6 +222,8 @@ func ConnectServerByProxy(proxyURL string, protocol string, addr string) (c net.
 		return ConnectServer(protocol, addr)
 	case "websocket":
 		return ConnectWebsocketServer(addr)
+	case "wss":
+		return ConnectWSSServer(addr)
 	default:
 		return nil, fmt.Errorf("unsupport protocol: %s", protocol)
 	}

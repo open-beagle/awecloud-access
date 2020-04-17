@@ -31,6 +31,7 @@ import (
 	"github.com/fatedier/frp/models/auth"
 	"github.com/fatedier/frp/models/config"
 	"github.com/fatedier/frp/utils/log"
+	unet "github.com/fatedier/frp/utils/net"
 	"github.com/fatedier/frp/utils/version"
 )
 
@@ -155,6 +156,11 @@ func parseClientCommonCfgFromCmd() (cfg config.ClientCommonConf, err error) {
 	if err != nil {
 		err = fmt.Errorf("invalid server_addr")
 		return
+	}
+
+	servPath := os.Getenv("SERVER_PATH")
+	if len(servPath) > 0 {
+		unet.FrpWebsocketPath = servPath
 	}
 
 	cfg.User = user

@@ -24,6 +24,7 @@ import (
 	"github.com/fatedier/frp/models/config"
 	"github.com/fatedier/frp/server"
 	"github.com/fatedier/frp/utils/log"
+	unet "github.com/fatedier/frp/utils/net"
 	"github.com/fatedier/frp/utils/util"
 	"github.com/fatedier/frp/utils/version"
 )
@@ -156,6 +157,11 @@ func parseServerCommonCfgFromIni(content string) (config.ServerCommonConf, error
 
 func parseServerCommonCfgFromCmd() (cfg config.ServerCommonConf, err error) {
 	cfg = config.GetDefaultServerConf()
+
+	servPath := os.Getenv("SERVER_PATH")
+	if len(servPath) > 0 {
+		unet.FrpWebsocketPath = servPath
+	}
 
 	cfg.BindAddr = bindAddr
 	cfg.BindPort = bindPort
