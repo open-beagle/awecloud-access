@@ -10,7 +10,7 @@ clone:
 pipeline:
 
   build-server:
-    image: registry.cn-qingdao.aliyuncs.com/wod/devops-go:1.13.10-stretch
+    image: registry.cn-qingdao.aliyuncs.com/wod/devops-go:1.13.10-alpine3.11
     binary: awecloud-access-server
     main: cmd/frps
 
@@ -18,7 +18,7 @@ pipeline:
     image: registry.cn-qingdao.aliyuncs.com/wod/devops-docker:1.0
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-    base: registry.cn-qingdao.aliyuncs.com/wod/alpine-glibc:3.10
+    base: registry.cn-qingdao.aliyuncs.com/wod/alpine:3.11
     dockerfile: build/server.dockerfile
     repo: wod/awecloud-access-server
     version: "0.33.0"
@@ -46,7 +46,7 @@ pipeline:
       branch: master
 
   build-client:
-    image: registry.cn-qingdao.aliyuncs.com/wod/devops-go:1.13.10-stretch
+    image: registry.cn-qingdao.aliyuncs.com/wod/devops-go:1.13.10-alpine3.11
     binary: awecloud-access-client
     main: cmd/frpc
 
@@ -55,7 +55,7 @@ pipeline:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     dockerfile: build/client.dockerfile
-    base: registry.cn-qingdao.aliyuncs.com/wod/alpine-glibc:3.10
+    base: registry.cn-qingdao.aliyuncs.com/wod/alpine:3.11
     repo: wod/awecloud-access-client
     version: "0.33.0"
     channel: alpha
