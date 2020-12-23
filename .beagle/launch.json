@@ -7,9 +7,9 @@
       "request": "launch",
       "mode": "debug",
       "remotePath": "",
-      "program": "${workspaceRoot}\\cmd\\frpc",
+      "program": "${workspaceRoot}/cmd/frpc",
       "args": [
-        "--config=${workspaceRoot}\\.beagle\\frpc.ini"
+        "--config=${workspaceRoot}/.vscode/frpc.ini"
       ],
       "showLog": true
     }

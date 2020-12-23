@@ -32,6 +32,8 @@ import (
 	"github.com/fatedier/frp/pkg/util/version"
 
 	"github.com/spf13/cobra"
+
+	unet "github.com/fatedier/frp/pkg/util/net"
 )
 
 const (
