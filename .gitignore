@@ -33,6 +33,7 @@ dist/
 
 # Cache
 *.swp
+*.log
 
 vendor
 .vscode

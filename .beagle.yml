@@ -174,7 +174,7 @@ pipeline:
     volumes:
       - /data/cache/golang/mod:/go/pkg/mod
     binary: awecloud-access-server
-    main: cmd/frpc
+    main: cmd/frps
     when:
       branch: dev
 

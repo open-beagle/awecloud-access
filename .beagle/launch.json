@@ -12,6 +12,22 @@
         "--config=${workspaceRoot}/.vscode/frpc.ini"
       ],
       "showLog": true
+    },
+    {
+      "name": "frps",
+      "type": "go",
+      "request": "launch",
+      "mode": "debug",
+      "remotePath": "",
+      "program": "${workspaceRoot}/cmd/frps",
+      "args": [
+        "--config=${workspaceRoot}/.vscode/frps.ini"
+      ],
+      "env": {
+        // "HTTP_PROXY": "http://127.0.0.1:8888",
+        "SERVER_PATH": "/rms/api"
+      },      
+      "showLog": true
     }
   ]
 }
