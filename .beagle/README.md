@@ -18,7 +18,8 @@ docker run \
 -e PLUGIN_BINARY=awecloud-access-server \
 -e PLUGIN_MAIN=cmd/frps \
 -e CI_WORKSPACE=/go/src/github.com/fatedier/frp \
-registry.cn-qingdao.aliyuncs.com/wod/devops-go:1.13.10-stretch
+-w /go/src/github.com/fatedier/frp \
+registry.cn-qingdao.aliyuncs.com/wod/devops-go:1.15.6-buster
 
 # client
 docker run \
@@ -27,5 +28,6 @@ docker run \
 -e PLUGIN_BINARY=awecloud-access-client \
 -e PLUGIN_MAIN=cmd/frpc \
 -e CI_WORKSPACE=/go/src/github.com/fatedier/frp \
-registry.cn-qingdao.aliyuncs.com/wod/devops-go:1.13.10-alpine3.11
+-w /go/src/github.com/fatedier/frp \
+registry.cn-qingdao.aliyuncs.com/wod/devops-go:1.15.6-alpine
 ```
