@@ -33,6 +33,17 @@ docker run \
 -w /go/src/github.com/fatedier/frp \
 registry.cn-qingdao.aliyuncs.com/wod/devops-go:1.15.6-alpine
 
+# client-amd64
+docker run \
+--rm \
+-v /go/pkg/:/go/pkg \
+-v $PWD/:/go/src/github.com/fatedier/frp \
+-e PLUGIN_BINARY=awecloud-access-client \
+-e PLUGIN_MAIN=cmd/frpc \
+-e CI_WORKSPACE=/go/src/github.com/fatedier/frp \
+-w /go/src/github.com/fatedier/frp \
+registry.cn-qingdao.aliyuncs.com/wod/devops-go:1.15.6-buster
+
 # client-ppc64le
 docker run \
 --rm \
