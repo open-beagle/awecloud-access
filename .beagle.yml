@@ -28,7 +28,7 @@ pipeline:
     base: registry.cn-qingdao.aliyuncs.com/wod/alpine:3.12
     dockerfile: build/client.dockerfile
     repo: wod/awecloud-access-client
-    version: "v0.34.3"
+    version: "v0.34.3-1"
     channel: alpha
     args: "TARGETOS=linux,TARGETARCH=amd64"
     registry: registry.cn-qingdao.aliyuncs.com
@@ -48,7 +48,7 @@ pipeline:
     base: registry.cn-qingdao.aliyuncs.com/wod/alpine:3.12-arm64
     dockerfile: build/client.dockerfile
     repo: wod/awecloud-access-client
-    version: "v0.34.3-arm64"
+    version: "v0.34.3-1-arm64"
     channel: alpha
     args: "TARGETOS=linux,TARGETARCH=arm64"
     registry: registry.cn-qingdao.aliyuncs.com
@@ -68,7 +68,7 @@ pipeline:
     base: registry.cn-qingdao.aliyuncs.com/wod/alpine:3.12-ppc64le
     dockerfile: build/client.dockerfile
     repo: wod/awecloud-access-client
-    version: "v0.34.3-ppc64le"
+    version: "v0.34.3-1-ppc64le"
     channel: alpha
     args: "TARGETOS=linux,TARGETARCH=ppc64le"
     registry: registry.cn-qingdao.aliyuncs.com
@@ -88,7 +88,7 @@ pipeline:
     base: registry.cn-qingdao.aliyuncs.com/wod/alpine:3.11-mips64le
     dockerfile: build/client.dockerfile
     repo: wod/awecloud-access-client
-    version: "v0.34.3-mips64le"
+    version: "v0.34.3-1-mips64le"
     channel: alpha
     args: "TARGETOS=linux,TARGETARCH=mips64le"
     registry: registry.cn-qingdao.aliyuncs.com
@@ -105,8 +105,8 @@ pipeline:
     dns: 223.5.5.5
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-    source: registry.cn-qingdao.aliyuncs.com/wod/awecloud-access-client:v0.34.3-alpha
-    target: registry.cn-qingdao.aliyuncs.com/wod/awecloud-access-client:v0.34.3
+    source: registry.cn-qingdao.aliyuncs.com/wod/awecloud-access-client:v0.34.3-1-alpha
+    target: registry.cn-qingdao.aliyuncs.com/wod/awecloud-access-client:v0.34.3-1
     registry: registry.cn-qingdao.aliyuncs.com
     secrets: 
       - source: REGISTRY_USER_ALIYUN
@@ -122,8 +122,8 @@ pipeline:
     dns: 223.5.5.5
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-    source: registry.cn-qingdao.aliyuncs.com/wod/awecloud-access-client:v0.34.3-arm64-alpha
-    target: registry.cn-qingdao.aliyuncs.com/wod/awecloud-access-client:v0.34.3-arm64
+    source: registry.cn-qingdao.aliyuncs.com/wod/awecloud-access-client:v0.34.3-1-arm64-alpha
+    target: registry.cn-qingdao.aliyuncs.com/wod/awecloud-access-client:v0.34.3-1-arm64
     registry: registry.cn-qingdao.aliyuncs.com
     secrets: 
       - source: REGISTRY_USER_ALIYUN
@@ -139,8 +139,8 @@ pipeline:
     dns: 223.5.5.5
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-    source: registry.cn-qingdao.aliyuncs.com/wod/awecloud-access-client:v0.34.3-ppc64le-alpha
-    target: registry.cn-qingdao.aliyuncs.com/wod/awecloud-access-client:v0.34.3-ppc64le
+    source: registry.cn-qingdao.aliyuncs.com/wod/awecloud-access-client:v0.34.3-1-ppc64le-alpha
+    target: registry.cn-qingdao.aliyuncs.com/wod/awecloud-access-client:v0.34.3-1-ppc64le
     registry: registry.cn-qingdao.aliyuncs.com
     secrets: 
       - source: REGISTRY_USER_ALIYUN
@@ -156,8 +156,8 @@ pipeline:
     dns: 223.5.5.5
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-    source: registry.cn-qingdao.aliyuncs.com/wod/awecloud-access-client:v0.34.3-mips64le-alpha
-    target: registry.cn-qingdao.aliyuncs.com/wod/awecloud-access-client:v0.34.3-mips64le
+    source: registry.cn-qingdao.aliyuncs.com/wod/awecloud-access-client:v0.34.3-1-mips64le-alpha
+    target: registry.cn-qingdao.aliyuncs.com/wod/awecloud-access-client:v0.34.3-1-mips64le
     registry: registry.cn-qingdao.aliyuncs.com
     secrets: 
       - source: REGISTRY_USER_ALIYUN
@@ -186,7 +186,7 @@ pipeline:
     base: registry.cn-qingdao.aliyuncs.com/wod/alpine:3.12
     dockerfile: build/server.dockerfile
     repo: wod/awecloud-access-server
-    version: "v0.34.3"
+    version: "v0.34.3-1"
     channel: alpha
     args: "TARGETOS=linux,TARGETARCH=amd64"
     registry: registry.cn-qingdao.aliyuncs.com
@@ -206,7 +206,7 @@ pipeline:
     base: registry.cn-qingdao.aliyuncs.com/wod/alpine:3.12-arm64
     dockerfile: build/server.dockerfile
     repo: wod/awecloud-access-server
-    version: "v0.34.3-arm64"
+    version: "v0.34.3-1-arm64"
     channel: alpha
     args: "TARGETOS=linux,TARGETARCH=arm64"
     registry: registry.cn-qingdao.aliyuncs.com
@@ -226,7 +226,7 @@ pipeline:
     base: registry.cn-qingdao.aliyuncs.com/wod/alpine:3.12-ppc64le
     dockerfile: build/server.dockerfile
     repo: wod/awecloud-access-server
-    version: "v0.34.3-ppc64le"
+    version: "v0.34.3-1-ppc64le"
     channel: alpha
     args: "TARGETOS=linux,TARGETARCH=ppc64le"
     registry: registry.cn-qingdao.aliyuncs.com
@@ -246,7 +246,7 @@ pipeline:
     base: registry.cn-qingdao.aliyuncs.com/wod/alpine:3.11-mips64le
     dockerfile: build/server.dockerfile
     repo: wod/awecloud-access-server
-    version: "v0.34.3-mips64le"
+    version: "v0.34.3-1-mips64le"
     channel: alpha
     args: "TARGETOS=linux,TARGETARCH=mips64le"
     registry: registry.cn-qingdao.aliyuncs.com
@@ -263,8 +263,8 @@ pipeline:
     dns: 223.5.5.5
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-    source: registry.cn-qingdao.aliyuncs.com/wod/awecloud-access-server:v0.34.3-alpha
-    target: registry.cn-qingdao.aliyuncs.com/wod/awecloud-access-server:v0.34.3
+    source: registry.cn-qingdao.aliyuncs.com/wod/awecloud-access-server:v0.34.3-1-alpha
+    target: registry.cn-qingdao.aliyuncs.com/wod/awecloud-access-server:v0.34.3-1
     registry: registry.cn-qingdao.aliyuncs.com
     secrets: 
       - source: REGISTRY_USER_ALIYUN
@@ -280,8 +280,8 @@ pipeline:
     dns: 223.5.5.5
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-    source: registry.cn-qingdao.aliyuncs.com/wod/awecloud-access-server:v0.34.3-arm64-alpha
-    target: registry.cn-qingdao.aliyuncs.com/wod/awecloud-access-server:v0.34.3-arm64
+    source: registry.cn-qingdao.aliyuncs.com/wod/awecloud-access-server:v0.34.3-1-arm64-alpha
+    target: registry.cn-qingdao.aliyuncs.com/wod/awecloud-access-server:v0.34.3-1-arm64
     registry: registry.cn-qingdao.aliyuncs.com
     secrets: 
       - source: REGISTRY_USER_ALIYUN
@@ -297,8 +297,8 @@ pipeline:
     dns: 223.5.5.5
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-    source: registry.cn-qingdao.aliyuncs.com/wod/awecloud-access-server:v0.34.3-ppc64le-alpha
-    target: registry.cn-qingdao.aliyuncs.com/wod/awecloud-access-server:v0.34.3-ppc64le
+    source: registry.cn-qingdao.aliyuncs.com/wod/awecloud-access-server:v0.34.3-1-ppc64le-alpha
+    target: registry.cn-qingdao.aliyuncs.com/wod/awecloud-access-server:v0.34.3-1-ppc64le
     registry: registry.cn-qingdao.aliyuncs.com
     secrets: 
       - source: REGISTRY_USER_ALIYUN
@@ -314,8 +314,8 @@ pipeline:
     dns: 223.5.5.5
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-    source: registry.cn-qingdao.aliyuncs.com/wod/awecloud-access-server:v0.34.3-mips64le-alpha
-    target: registry.cn-qingdao.aliyuncs.com/wod/awecloud-access-server:v0.34.3-mips64le
+    source: registry.cn-qingdao.aliyuncs.com/wod/awecloud-access-server:v0.34.3-1-mips64le-alpha
+    target: registry.cn-qingdao.aliyuncs.com/wod/awecloud-access-server:v0.34.3-1-mips64le
     registry: registry.cn-qingdao.aliyuncs.com
     secrets: 
       - source: REGISTRY_USER_ALIYUN

@@ -61,7 +61,7 @@ docker run \
 --rm \
 -v /go/pkg/:/go/pkg \
 -v $PWD/:/go/src/github.com/fatedier/frp \
--e PLUGIN_BINARY=awecloud-access-client-v0.34.3-linux-arm64 \
+-e PLUGIN_BINARY=awecloud-access-client-v0.34.3-1-linux-arm64 \
 -e PLUGIN_MAIN=cmd/frpc \
 -e CI_WORKSPACE=/go/src/github.com/fatedier/frp \
 -e GOARCH=arm64 \

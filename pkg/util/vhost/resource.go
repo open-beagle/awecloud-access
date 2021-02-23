@@ -41,11 +41,10 @@ const (
 </style>
 </head>
 <body>
-<h1>The page you requested was not found.</h1>
-<p>Sorry, the page you are looking for is currently unavailable.<br/>
-Please try again later.</p>
-<p>The server is powered by <a href="https://github.com/fatedier/frp">frp</a>.</p>
-<p><em>Faithfully yours, frp.</em></p>
+<h1>服务已中断.</h1>
+<p>提示： 您访问的页面出现错误，请联系管理员.<br/></p>
+<p>The server is powered by <a href="https://www.bd-apaas.com">Beagle Cloud Team</a>.</p>
+<p><em>请稍后再试.</em></p>
 </body>
 </html>
 `
@@ -70,7 +69,7 @@ func getNotFoundPageContent() []byte {
 
 func notFoundResponse() *http.Response {
 	header := make(http.Header)
-	header.Set("server", "frp/"+version.Full())
+	header.Set("server", "beagle-access/"+version.Full())
 	header.Set("Content-Type", "text/html")
 
 	res := &http.Response{
