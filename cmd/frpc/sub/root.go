@@ -169,6 +169,10 @@ func parseClientCommonCfgFromCmd() (cfg config.ClientCommonConf, err error) {
 
 func runClient(cfgFilePath string) error {
 	cfg, pxyCfgs, visitorCfgs, err := config.ParseClientConfig(cfgFilePath)
+	servPath := cfg.ServerPath
+	if len(servPath) > 0 {
+		unet.FrpWebsocketPath = servPath
+	}
 	if err != nil {
 		return err
 	}
