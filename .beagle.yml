@@ -192,6 +192,7 @@ steps:
       - harbor-arm64
       - harbor-ppc64le
 
+---
 kind: pipeline
 name: docker-server
 
