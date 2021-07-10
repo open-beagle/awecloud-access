@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"net/url"
 	"os"
-	"strings"
 	"testing"
 	"time"
 
@@ -13,7 +12,6 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/fatedier/frp/client/proxy"
-	"github.com/fatedier/frp/server/ports"
 	"github.com/fatedier/frp/tests/consts"
 	"github.com/fatedier/frp/tests/mock"
 	"github.com/fatedier/frp/tests/util"
@@ -42,7 +40,7 @@ func TestMain(m *testing.M) {
 		panic(err)
 	}
 
-	time.Sleep(200 * time.Millisecond)
+	time.Sleep(500 * time.Millisecond)
 	p2 := util.NewProcess(consts.FRPC_BIN_PATH, []string{"-c", "./auto_test_frpc.ini"})
 	if err = p2.Start(); err != nil {
 		panic(err)
@@ -155,17 +153,6 @@ func TestHTTP(t *testing.T) {
 	}
 }
 
-func TestTCPMux(t *testing.T) {
-	assert := assert.New(t)
-
-	conn, err := gnet.DialTcpByProxy(fmt.Sprintf("http://%s:%d", "127.0.0.1", consts.TEST_TCP_MUX_FRP_PORT), "tunnel1")
-	if assert.NoError(err) {
-		res, err := util.SendTCPMsgByConn(conn, consts.TEST_TCP_ECHO_STR)
-		assert.NoError(err)
-		assert.Equal(consts.TEST_TCP_ECHO_STR, res)
-	}
-}
-
 func TestWebSocket(t *testing.T) {
 	assert := assert.New(t)
 
@@ -180,39 +167,6 @@ func TestWebSocket(t *testing.T) {
 	_, msg, err := c.ReadMessage()
 	assert.NoError(err)
 	assert.Equal(consts.TEST_HTTP_NORMAL_STR, string(msg))
-}
-
-func TestAllowPorts(t *testing.T) {
-	assert := assert.New(t)
-	// Port not allowed
-	status, err := util.GetProxyStatus(consts.ADMIN_ADDR, consts.ADMIN_USER, consts.ADMIN_PWD, consts.ProxyTCPPortNotAllowed)
-	if assert.NoError(err) {
-		assert.Equal(proxy.ProxyPhaseStartErr, status.Status)
-		assert.True(strings.Contains(status.Err, ports.ErrPortNotAllowed.Error()))
-	}
-
-	status, err = util.GetProxyStatus(consts.ADMIN_ADDR, consts.ADMIN_USER, consts.ADMIN_PWD, consts.ProxyUDPPortNotAllowed)
-	if assert.NoError(err) {
-		assert.Equal(proxy.ProxyPhaseStartErr, status.Status)
-		assert.True(strings.Contains(status.Err, ports.ErrPortNotAllowed.Error()))
-	}
-
-	status, err = util.GetProxyStatus(consts.ADMIN_ADDR, consts.ADMIN_USER, consts.ADMIN_PWD, consts.ProxyTCPPortUnavailable)
-	if assert.NoError(err) {
-		assert.Equal(proxy.ProxyPhaseStartErr, status.Status)
-		assert.True(strings.Contains(status.Err, ports.ErrPortUnAvailable.Error()))
-	}
-
-	// Port normal
-	status, err = util.GetProxyStatus(consts.ADMIN_ADDR, consts.ADMIN_USER, consts.ADMIN_PWD, consts.ProxyTCPPortNormal)
-	if assert.NoError(err) {
-		assert.Equal(proxy.ProxyPhaseRunning, status.Status)
-	}
-
-	status, err = util.GetProxyStatus(consts.ADMIN_ADDR, consts.ADMIN_USER, consts.ADMIN_PWD, consts.ProxyUDPPortNormal)
-	if assert.NoError(err) {
-		assert.Equal(proxy.ProxyPhaseRunning, status.Status)
-	}
 }
 
 func TestRandomPort(t *testing.T) {
