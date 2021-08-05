@@ -5,7 +5,7 @@ git remote add upstream git@github.com:fatedier/frp.git
 
 git fetch upstream
 
-git merge v0.37.0
+git merge v0.37.1
 ```
 
 ## debug
@@ -32,4 +32,9 @@ docker run \
 -e CI_WORKSPACE=/go/src/github.com/fatedier/frp \
 -w /go/src/github.com/fatedier/frp \
 registry.cn-qingdao.aliyuncs.com/wod/devops-go-arch:1.16.5-alpine
+
+# windows
+CGO_ENABLED=0 GOOS=windows GOARCH=amd64 \
+go build -o $PWD/dist/awecloud-access-client.exe \
+cmd/frpc/main.go
 ```
