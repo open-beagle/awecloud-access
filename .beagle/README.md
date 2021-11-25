@@ -20,7 +20,7 @@ docker run \
 -e PLUGIN_MAIN=cmd/frps \
 -e CI_WORKSPACE=/go/src/github.com/fatedier/frp \
 -w /go/src/github.com/fatedier/frp \
-registry.cn-qingdao.aliyuncs.com/wod/devops-go-arch:1.16.5-alpine
+registry.cn-qingdao.aliyuncs.com/wod/devops-go-arch:1.17.3-alpine
 
 # client
 docker run \
@@ -31,7 +31,7 @@ docker run \
 -e PLUGIN_MAIN=cmd/frpc \
 -e CI_WORKSPACE=/go/src/github.com/fatedier/frp \
 -w /go/src/github.com/fatedier/frp \
-registry.cn-qingdao.aliyuncs.com/wod/devops-go-arch:1.16.5-alpine
+registry.cn-qingdao.aliyuncs.com/wod/devops-go-arch:1.17.3-alpine
 
 # windows
 CGO_ENABLED=0 GOOS=windows GOARCH=amd64 \
