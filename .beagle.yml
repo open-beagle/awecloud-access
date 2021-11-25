@@ -9,8 +9,7 @@ platform:
   runner: 10.11.92.36
 
 workspace:
-  base: /go
-  path: src/github.com/fatedier/frp
+  path: github.com/fatedier/frp
 
 volumes:
   - name: go
@@ -36,7 +35,7 @@ steps:
       - name: docker
         path: /var/run/docker.sock
     settings:
-      base: registry.cn-qingdao.aliyuncs.com/wod/alpine:3.13
+      base: registry.cn-qingdao.aliyuncs.com/wod/alpine:3.14-amd64
       dockerfile: build/client.dockerfile
       repo: wod/awecloud-access-client
       version: 'v0.37.1'
@@ -54,7 +53,7 @@ steps:
       - name: docker
         path: /var/run/docker.sock
     settings:
-      base: registry.cn-qingdao.aliyuncs.com/wod/alpine:3.13-arm64
+      base: registry.cn-qingdao.aliyuncs.com/wod/alpine:3.14-arm64
       dockerfile: build/client.dockerfile
       repo: wod/awecloud-access-client
       version: 'v0.37.1'
@@ -72,7 +71,7 @@ steps:
       - name: docker
         path: /var/run/docker.sock
     settings:
-      base: registry.cn-qingdao.aliyuncs.com/wod/alpine:3.13-ppc64le
+      base: registry.cn-qingdao.aliyuncs.com/wod/alpine:3.14-ppc64le
       dockerfile: build/client.dockerfile
       repo: wod/awecloud-access-client
       version: 'v0.37.1'
@@ -90,7 +89,7 @@ steps:
       - name: docker
         path: /var/run/docker.sock
     settings:
-      base: registry.cn-qingdao.aliyuncs.com/wod/alpine:3.13-mips64le
+      base: registry.cn-qingdao.aliyuncs.com/wod/alpine:3.14-mips64le
       dockerfile: build/client.dockerfile
       repo: wod/awecloud-access-client
       version: 'v0.37.1'
@@ -126,10 +125,6 @@ trigger:
 
 platform:
   runner: 10.11.92.36
-
-workspace:
-  base: /go
-  path: src/github.com/fatedier/frp
 
 volumes:
   - name: docker
@@ -222,8 +217,7 @@ platform:
   runner: 10.11.92.40
 
 workspace:
-  base: /go
-  path: src/github.com/fatedier/frp
+  path: github.com/fatedier/frp
 
 volumes:
   - name: go
@@ -249,7 +243,7 @@ steps:
       - name: docker
         path: /var/run/docker.sock
     settings:
-      base: registry.cn-qingdao.aliyuncs.com/wod/alpine:3.13
+      base: registry.cn-qingdao.aliyuncs.com/wod/alpine:3.14-amd64
       dockerfile: build/server.dockerfile
       repo: wod/awecloud-access-server
       version: 'v0.37.1'
@@ -267,7 +261,7 @@ steps:
       - name: docker
         path: /var/run/docker.sock
     settings:
-      base: registry.cn-qingdao.aliyuncs.com/wod/alpine:3.13-arm64
+      base: registry.cn-qingdao.aliyuncs.com/wod/alpine:3.14-arm64
       dockerfile: build/server.dockerfile
       repo: wod/awecloud-access-server
       version: 'v0.37.1'
@@ -285,7 +279,7 @@ steps:
       - name: docker
         path: /var/run/docker.sock
     settings:
-      base: registry.cn-qingdao.aliyuncs.com/wod/alpine:3.13-ppc64le
+      base: registry.cn-qingdao.aliyuncs.com/wod/alpine:3.14-ppc64le
       dockerfile: build/server.dockerfile
       repo: wod/awecloud-access-server
       version: 'v0.37.1'
@@ -303,7 +297,7 @@ steps:
       - name: docker
         path: /var/run/docker.sock
     settings:
-      base: registry.cn-qingdao.aliyuncs.com/wod/alpine:3.13-mips64le
+      base: registry.cn-qingdao.aliyuncs.com/wod/alpine:3.11-mips64le
       dockerfile: build/server.dockerfile
       repo: wod/awecloud-access-server
       version: 'v0.37.1'
