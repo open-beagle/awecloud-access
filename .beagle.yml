@@ -89,7 +89,7 @@ steps:
       - name: docker
         path: /var/run/docker.sock
     settings:
-      base: registry.cn-qingdao.aliyuncs.com/wod/alpine:3.14-mips64le
+      base: registry.cn-qingdao.aliyuncs.com/wod/alpine:3.11-mips64le
       dockerfile: build/client.dockerfile
       repo: wod/awecloud-access-client
       version: 'v0.37.1'
