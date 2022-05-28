@@ -16,18 +16,13 @@ package net
 
 import (
 	"context"
-	"crypto/tls"
 	"errors"
-	"fmt"
 	"io"
 	"net"
 	"sync/atomic"
 	"time"
 
 	"github.com/fatedier/frp/pkg/util/xlog"
-
-	gnet "github.com/fatedier/golib/net"
-	kcp "github.com/fatedier/kcp-go"
 )
 
 type ContextGetter interface {

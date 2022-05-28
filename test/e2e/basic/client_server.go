@@ -231,4 +231,41 @@ var _ = Describe("[Feature: Client-Server]", func() {
 			})
 		})
 	})
+
+	Describe("TLS with disable_custom_tls_first_byte", func() {
+		supportProtocols := []string{"tcp", "kcp", "websocket"}
+		for _, protocol := range supportProtocols {
+			tmp := protocol
+			defineClientServerTest("TLS over "+strings.ToUpper(tmp), f, &generalTestConfigures{
+				server: fmt.Sprintf(`
+					kcp_bind_port = {{ .%s }}
+					protocol = %s
+					`, consts.PortServerName, protocol),
+				client: fmt.Sprintf(`
+					tls_enable = true
+					protocol = %s
+					disable_custom_tls_first_byte = true
+					`, protocol),
+			})
+		}
+	})
+
+	Describe("IPv6 bind address", func() {
+		supportProtocols := []string{"tcp", "kcp", "websocket"}
+		for _, protocol := range supportProtocols {
+			tmp := protocol
+			defineClientServerTest("IPv6 bind address: "+strings.ToUpper(tmp), f, &generalTestConfigures{
+				server: fmt.Sprintf(`
+					bind_addr = ::
+					kcp_bind_port = {{ .%s }}
+					protocol = %s
+					`, consts.PortServerName, protocol),
+				client: fmt.Sprintf(`
+					tls_enable = true
+					protocol = %s
+					disable_custom_tls_first_byte = true
+					`, protocol),
+			})
+		}
+	})
 })
