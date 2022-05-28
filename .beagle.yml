@@ -16,12 +16,30 @@ volumes:
     host:
       path: /var/run/docker.sock
 
+clone:
+  disable: true
+
 steps:
+  - name: fetch
+    image: registry.cn-qingdao.aliyuncs.com/wod/devops-git:1.0
+    network_mode: host
+
+  - name: s3-cache
+    image: registry.cn-qingdao.aliyuncs.com/wod/devops-s3-cache:1.0
+    network_mode: host
+    settings:
+      restore: true
+      mount:
+        - ./node_modules
+        - ./vendor
+      endpoint: http://cache.wodcloud.com
+      access_key:
+        from_secret: ACCESS_KEY_MINIO
+      secret_key:
+        from_secret: SECRET_KEY_MINIO
+
   - name: build-go
     image: registry.cn-qingdao.aliyuncs.com/wod/devops-go-arch:1.17-alpine
-    volumes:
-      - name: go
-        path: /go/pkg
     settings:
       binary: awecloud-access-client
       main: cmd/frpc
@@ -221,12 +239,26 @@ volumes:
     host:
       path: /var/run/docker.sock
 
-steps:
+  - name: fetch
+    image: registry.cn-qingdao.aliyuncs.com/wod/devops-git:1.0
+    network_mode: host
+
+  - name: s3-cache
+    image: registry.cn-qingdao.aliyuncs.com/wod/devops-s3-cache:1.0
+    network_mode: host
+    settings:
+      restore: true
+      mount:
+        - ./node_modules
+        - ./vendor
+      endpoint: http://cache.wodcloud.com
+      access_key:
+        from_secret: ACCESS_KEY_MINIO
+      secret_key:
+        from_secret: SECRET_KEY_MINIO
+
   - name: build-go
     image: registry.cn-qingdao.aliyuncs.com/wod/devops-go-arch:1.17-alpine
-    volumes:
-      - name: go
-        path: /go/pkg
     settings:
       binary: awecloud-access-server
       main: cmd/frps
