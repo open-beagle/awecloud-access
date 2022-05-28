@@ -259,6 +259,9 @@ func (svr *Service) login() (conn net.Conn, session *fmux.Session, err error) {
 	if protocol == "websocket" {
 		protocol = "tcp"
 		dialOptions = append(dialOptions, libdial.WithAfterHook(libdial.AfterHook{Hook: frpNet.DialHookWebsocket()}))
+	} else if protocol == "wss" {
+		protocol = "tcp"
+		dialOptions = append(dialOptions, libdial.WithAfterHook(libdial.AfterHook{Hook: frpNet.DialHookWSS()}))
 	}
 	if svr.cfg.ConnectServerLocalIP != "" {
 		dialOptions = append(dialOptions, libdial.WithLocalAddr(svr.cfg.ConnectServerLocalIP))

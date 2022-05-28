@@ -9,19 +9,16 @@ platform:
   runner: 10.11.92.36
 
 workspace:
-  path: github.com/fatedier/frp
+  path: /go/src/github.com/fatedier/frp
 
 volumes:
-  - name: go
-    host:
-      path: /data/cache/golang/pkg/
   - name: docker
     host:
       path: /var/run/docker.sock
 
 steps:
   - name: build-go
-    image: registry.cn-qingdao.aliyuncs.com/wod/devops-go-arch:1.17.3-alpine
+    image: registry.cn-qingdao.aliyuncs.com/wod/devops-go-arch:1.17-alpine
     volumes:
       - name: go
         path: /go/pkg
@@ -35,10 +32,10 @@ steps:
       - name: docker
         path: /var/run/docker.sock
     settings:
-      base: registry.cn-qingdao.aliyuncs.com/wod/alpine:3.14-amd64
+      base: registry.cn-qingdao.aliyuncs.com/wod/alpine:3-amd64
       dockerfile: build/client.dockerfile
       repo: wod/awecloud-access-client
-      version: 'v0.37.1'
+      version: 'v0.43.0'
       channel: alpha-amd64
       args: 'TARGETOS=linux,TARGETARCH=amd64'
       registry: registry.cn-qingdao.aliyuncs.com
@@ -53,10 +50,10 @@ steps:
       - name: docker
         path: /var/run/docker.sock
     settings:
-      base: registry.cn-qingdao.aliyuncs.com/wod/alpine:3.14-arm64
+      base: registry.cn-qingdao.aliyuncs.com/wod/alpine:3-arm64
       dockerfile: build/client.dockerfile
       repo: wod/awecloud-access-client
-      version: 'v0.37.1'
+      version: 'v0.43.0'
       channel: alpha-arm64
       args: 'TARGETOS=linux,TARGETARCH=arm64'
       registry: registry.cn-qingdao.aliyuncs.com
@@ -71,10 +68,10 @@ steps:
       - name: docker
         path: /var/run/docker.sock
     settings:
-      base: registry.cn-qingdao.aliyuncs.com/wod/alpine:3.14-ppc64le
+      base: registry.cn-qingdao.aliyuncs.com/wod/alpine:3-ppc64le
       dockerfile: build/client.dockerfile
       repo: wod/awecloud-access-client
-      version: 'v0.37.1'
+      version: 'v0.43.0'
       channel: alpha-ppc64le
       args: 'TARGETOS=linux,TARGETARCH=ppc64le'
       registry: registry.cn-qingdao.aliyuncs.com
@@ -89,10 +86,10 @@ steps:
       - name: docker
         path: /var/run/docker.sock
     settings:
-      base: registry.cn-qingdao.aliyuncs.com/wod/alpine:3.11-mips64le
+      base: registry.cn-qingdao.aliyuncs.com/wod/alpine:3-mips64le
       dockerfile: build/client.dockerfile
       repo: wod/awecloud-access-client
-      version: 'v0.37.1'
+      version: 'v0.43.0'
       channel: alpha-mips64le
       args: 'TARGETOS=linux,TARGETARCH=mips64le'
       registry: registry.cn-qingdao.aliyuncs.com
@@ -102,14 +99,14 @@ steps:
         from_secret: REGISTRY_PASSWORD_ALIYUN
 
   - name: docker-arch
-    image: registry.cn-qingdao.aliyuncs.com/wod/devops-docker-manifest:v1.2.3
+    image: registry.cn-qingdao.aliyuncs.com/wod/devops-docker-manifest:1.0
     volumes:
       - name: docker
         path: /var/run/docker.sock
     settings:
       platforms: linux/amd64,linux/arm64,linux/ppc64le,linux/mips64le
-      template: registry.cn-qingdao.aliyuncs.com/wod/awecloud-access-client:v0.37.1-alpha-ARCH
-      target: registry.cn-qingdao.aliyuncs.com/wod/awecloud-access-client:v0.37.1-alpha
+      template: registry.cn-qingdao.aliyuncs.com/wod/awecloud-access-client:v0.43.0-alpha-ARCH
+      target: registry.cn-qingdao.aliyuncs.com/wod/awecloud-access-client:v0.43.0-alpha
       username:
         from_secret: REGISTRY_USER_ALIYUN
       password:
@@ -141,8 +138,8 @@ steps:
       - name: docker
         path: /var/run/docker.sock
     settings:
-      source: registry.cn-qingdao.aliyuncs.com/wod/awecloud-access-client:v0.37.1-alpha-amd64
-      target: registry.cn-qingdao.aliyuncs.com/wod/awecloud-access-client:v0.37.1-amd64
+      source: registry.cn-qingdao.aliyuncs.com/wod/awecloud-access-client:v0.43.0-alpha-amd64
+      target: registry.cn-qingdao.aliyuncs.com/wod/awecloud-access-client:v0.43.0-amd64
       registry: registry.cn-qingdao.aliyuncs.com
       registry_user:
         from_secret: REGISTRY_USER_ALIYUN
@@ -155,8 +152,8 @@ steps:
       - name: docker
         path: /var/run/docker.sock
     settings:
-      source: registry.cn-qingdao.aliyuncs.com/wod/awecloud-access-client:v0.37.1-alpha-arm64
-      target: registry.cn-qingdao.aliyuncs.com/wod/awecloud-access-client:v0.37.1-arm64
+      source: registry.cn-qingdao.aliyuncs.com/wod/awecloud-access-client:v0.43.0-alpha-arm64
+      target: registry.cn-qingdao.aliyuncs.com/wod/awecloud-access-client:v0.43.0-arm64
       registry: registry.cn-qingdao.aliyuncs.com
       registry_user:
         from_secret: REGISTRY_USER_ALIYUN
@@ -169,8 +166,8 @@ steps:
       - name: docker
         path: /var/run/docker.sock
     settings:
-      source: registry.cn-qingdao.aliyuncs.com/wod/awecloud-access-client:v0.37.1-alpha-ppc64le
-      target: registry.cn-qingdao.aliyuncs.com/wod/awecloud-access-client:v0.37.1-ppc64le
+      source: registry.cn-qingdao.aliyuncs.com/wod/awecloud-access-client:v0.43.0-alpha-ppc64le
+      target: registry.cn-qingdao.aliyuncs.com/wod/awecloud-access-client:v0.43.0-ppc64le
       registry: registry.cn-qingdao.aliyuncs.com
       registry_user:
         from_secret: REGISTRY_USER_ALIYUN
@@ -183,8 +180,8 @@ steps:
       - name: docker
         path: /var/run/docker.sock
     settings:
-      source: registry.cn-qingdao.aliyuncs.com/wod/awecloud-access-client:v0.37.1-alpha-mips64le
-      target: registry.cn-qingdao.aliyuncs.com/wod/awecloud-access-client:v0.37.1-mips64le
+      source: registry.cn-qingdao.aliyuncs.com/wod/awecloud-access-client:v0.43.0-alpha-mips64le
+      target: registry.cn-qingdao.aliyuncs.com/wod/awecloud-access-client:v0.43.0-mips64le
       registry: registry.cn-qingdao.aliyuncs.com
       registry_user:
         from_secret: REGISTRY_USER_ALIYUN
@@ -192,14 +189,14 @@ steps:
         from_secret: REGISTRY_PASSWORD_ALIYUN
 
   - name: harbor-arch
-    image: registry.cn-qingdao.aliyuncs.com/wod/devops-docker-manifest:v1.2.3
+    image: registry.cn-qingdao.aliyuncs.com/wod/devops-docker-manifest:1.0
     volumes:
       - name: docker
         path: /var/run/docker.sock
     settings:
       platforms: linux/amd64,linux/arm64,linux/ppc64le,linux/mips64le
-      template: registry.cn-qingdao.aliyuncs.com/wod/awecloud-access-client:v0.37.1-ARCH
-      target: registry.cn-qingdao.aliyuncs.com/wod/awecloud-access-client:v0.37.1
+      template: registry.cn-qingdao.aliyuncs.com/wod/awecloud-access-client:v0.43.0-ARCH
+      target: registry.cn-qingdao.aliyuncs.com/wod/awecloud-access-client:v0.43.0
       username:
         from_secret: REGISTRY_USER_ALIYUN
       password:
@@ -217,19 +214,16 @@ platform:
   runner: 10.11.92.40
 
 workspace:
-  path: github.com/fatedier/frp
+  path: /go/src/github.com/fatedier/frp
 
 volumes:
-  - name: go
-    host:
-      path: /data/cache/golang/pkg/
   - name: docker
     host:
       path: /var/run/docker.sock
 
 steps:
   - name: build-go
-    image: registry.cn-qingdao.aliyuncs.com/wod/devops-go-arch:1.17.3-alpine
+    image: registry.cn-qingdao.aliyuncs.com/wod/devops-go-arch:1.17-alpine
     volumes:
       - name: go
         path: /go/pkg
@@ -243,10 +237,10 @@ steps:
       - name: docker
         path: /var/run/docker.sock
     settings:
-      base: registry.cn-qingdao.aliyuncs.com/wod/alpine:3.14-amd64
+      base: registry.cn-qingdao.aliyuncs.com/wod/alpine:3-amd64
       dockerfile: build/server.dockerfile
       repo: wod/awecloud-access-server
-      version: 'v0.37.1'
+      version: 'v0.43.0'
       channel: alpha-amd64
       args: 'TARGETOS=linux,TARGETARCH=amd64'
       registry: registry.cn-qingdao.aliyuncs.com
@@ -261,10 +255,10 @@ steps:
       - name: docker
         path: /var/run/docker.sock
     settings:
-      base: registry.cn-qingdao.aliyuncs.com/wod/alpine:3.14-arm64
+      base: registry.cn-qingdao.aliyuncs.com/wod/alpine:3-arm64
       dockerfile: build/server.dockerfile
       repo: wod/awecloud-access-server
-      version: 'v0.37.1'
+      version: 'v0.43.0'
       channel: alpha-arm64
       args: 'TARGETOS=linux,TARGETARCH=arm64'
       registry: registry.cn-qingdao.aliyuncs.com
@@ -279,10 +273,10 @@ steps:
       - name: docker
         path: /var/run/docker.sock
     settings:
-      base: registry.cn-qingdao.aliyuncs.com/wod/alpine:3.14-ppc64le
+      base: registry.cn-qingdao.aliyuncs.com/wod/alpine:3-ppc64le
       dockerfile: build/server.dockerfile
       repo: wod/awecloud-access-server
-      version: 'v0.37.1'
+      version: 'v0.43.0'
       channel: alpha-ppc64le
       args: 'TARGETOS=linux,TARGETARCH=ppc64le'
       registry: registry.cn-qingdao.aliyuncs.com
@@ -297,10 +291,10 @@ steps:
       - name: docker
         path: /var/run/docker.sock
     settings:
-      base: registry.cn-qingdao.aliyuncs.com/wod/alpine:3.11-mips64le
+      base: registry.cn-qingdao.aliyuncs.com/wod/alpine:3-mips64le
       dockerfile: build/server.dockerfile
       repo: wod/awecloud-access-server
-      version: 'v0.37.1'
+      version: 'v0.43.0'
       channel: alpha-mips64le
       args: 'TARGETOS=linux,TARGETARCH=mips64le'
       registry: registry.cn-qingdao.aliyuncs.com
@@ -310,14 +304,14 @@ steps:
         from_secret: REGISTRY_PASSWORD_ALIYUN
 
   - name: docker-arch
-    image: registry.cn-qingdao.aliyuncs.com/wod/devops-docker-manifest:v1.2.3
+    image: registry.cn-qingdao.aliyuncs.com/wod/devops-docker-manifest:1.0
     volumes:
       - name: docker
         path: /var/run/docker.sock
     settings:
       platforms: linux/amd64,linux/arm64,linux/ppc64le,linux/mips64le
-      template: registry.cn-qingdao.aliyuncs.com/wod/awecloud-access-server:v0.37.1-alpha-ARCH
-      target: registry.cn-qingdao.aliyuncs.com/wod/awecloud-access-server:v0.37.1-alpha
+      template: registry.cn-qingdao.aliyuncs.com/wod/awecloud-access-server:v0.43.0-alpha-ARCH
+      target: registry.cn-qingdao.aliyuncs.com/wod/awecloud-access-server:v0.43.0-alpha
       username:
         from_secret: REGISTRY_USER_ALIYUN
       password:
@@ -353,8 +347,8 @@ steps:
       - name: docker
         path: /var/run/docker.sock
     settings:
-      source: registry.cn-qingdao.aliyuncs.com/wod/awecloud-access-server:v0.37.1-alpha-amd64
-      target: registry.cn-qingdao.aliyuncs.com/wod/awecloud-access-server:v0.37.1-amd64
+      source: registry.cn-qingdao.aliyuncs.com/wod/awecloud-access-server:v0.43.0-alpha-amd64
+      target: registry.cn-qingdao.aliyuncs.com/wod/awecloud-access-server:v0.43.0-amd64
       registry: registry.cn-qingdao.aliyuncs.com
       registry_user:
         from_secret: REGISTRY_USER_ALIYUN
@@ -367,8 +361,8 @@ steps:
       - name: docker
         path: /var/run/docker.sock
     settings:
-      source: registry.cn-qingdao.aliyuncs.com/wod/awecloud-access-server:v0.37.1-alpha-arm64
-      target: registry.cn-qingdao.aliyuncs.com/wod/awecloud-access-server:v0.37.1-arm64
+      source: registry.cn-qingdao.aliyuncs.com/wod/awecloud-access-server:v0.43.0-alpha-arm64
+      target: registry.cn-qingdao.aliyuncs.com/wod/awecloud-access-server:v0.43.0-arm64
       registry: registry.cn-qingdao.aliyuncs.com
       registry_user:
         from_secret: REGISTRY_USER_ALIYUN
@@ -381,8 +375,8 @@ steps:
       - name: docker
         path: /var/run/docker.sock
     settings:
-      source: registry.cn-qingdao.aliyuncs.com/wod/awecloud-access-server:v0.37.1-alpha-ppc64le
-      target: registry.cn-qingdao.aliyuncs.com/wod/awecloud-access-server:v0.37.1-ppc64le
+      source: registry.cn-qingdao.aliyuncs.com/wod/awecloud-access-server:v0.43.0-alpha-ppc64le
+      target: registry.cn-qingdao.aliyuncs.com/wod/awecloud-access-server:v0.43.0-ppc64le
       registry: registry.cn-qingdao.aliyuncs.com
       registry_user:
         from_secret: REGISTRY_USER_ALIYUN
@@ -395,8 +389,8 @@ steps:
       - name: docker
         path: /var/run/docker.sock
     settings:
-      source: registry.cn-qingdao.aliyuncs.com/wod/awecloud-access-server:v0.37.1-alpha-mips64le
-      target: registry.cn-qingdao.aliyuncs.com/wod/awecloud-access-server:v0.37.1-mips64le
+      source: registry.cn-qingdao.aliyuncs.com/wod/awecloud-access-server:v0.43.0-alpha-mips64le
+      target: registry.cn-qingdao.aliyuncs.com/wod/awecloud-access-server:v0.43.0-mips64le
       registry: registry.cn-qingdao.aliyuncs.com
       registry_user:
         from_secret: REGISTRY_USER_ALIYUN
@@ -404,14 +398,14 @@ steps:
         from_secret: REGISTRY_PASSWORD_ALIYUN
 
   - name: harbor-arch
-    image: registry.cn-qingdao.aliyuncs.com/wod/devops-docker-manifest:v1.2.3
+    image: registry.cn-qingdao.aliyuncs.com/wod/devops-docker-manifest:1.0
     volumes:
       - name: docker
         path: /var/run/docker.sock
     settings:
       platforms: linux/amd64,linux/arm64,linux/ppc64le,linux/mips64le
-      template: registry.cn-qingdao.aliyuncs.com/wod/awecloud-access-server:v0.37.1-ARCH
-      target: registry.cn-qingdao.aliyuncs.com/wod/awecloud-access-server:v0.37.1
+      template: registry.cn-qingdao.aliyuncs.com/wod/awecloud-access-server:v0.43.0-ARCH
+      target: registry.cn-qingdao.aliyuncs.com/wod/awecloud-access-server:v0.43.0
       username:
         from_secret: REGISTRY_USER_ALIYUN
       password:
