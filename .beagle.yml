@@ -30,7 +30,6 @@ steps:
     settings:
       restore: true
       mount:
-        - ./node_modules
         - ./vendor
       endpoint: http://cache.wodcloud.com
       access_key:
@@ -239,6 +238,10 @@ volumes:
     host:
       path: /var/run/docker.sock
 
+clone:
+  disable: true
+
+steps:
   - name: fetch
     image: registry.cn-qingdao.aliyuncs.com/wod/devops-git:1.0
     network_mode: host
@@ -249,7 +252,6 @@ volumes:
     settings:
       restore: true
       mount:
-        - ./node_modules
         - ./vendor
       endpoint: http://cache.wodcloud.com
       access_key:
