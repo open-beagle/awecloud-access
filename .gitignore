@@ -36,6 +36,6 @@ dist/
 *.swp
 *.log
 
-vendor
-.vscode
+vendor/
+.vscode/
 __debug_bin

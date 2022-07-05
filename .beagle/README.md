@@ -24,6 +24,9 @@ docker run \
 -w /go/src/github.com/fatedier/frp \
 registry.cn-qingdao.aliyuncs.com/wod/devops-go-arch:1.17-alpine
 
+# start server
+$PWD/dist/awecloud-access-server-linux-amd64 -c $PWD/.vscode/frps.ini
+
 # client
 docker run \
 --rm \
@@ -34,6 +37,9 @@ docker run \
 -e CI_WORKSPACE=/go/src/github.com/fatedier/frp \
 -w /go/src/github.com/fatedier/frp \
 registry.cn-qingdao.aliyuncs.com/wod/devops-go-arch:1.17-alpine
+
+# start client
+$PWD/dist/awecloud-access-client-linux-amd64 -c $PWD/.vscode/frpc.ini
 
 # windows
 CGO_ENABLED=0 GOOS=windows GOARCH=amd64 \
