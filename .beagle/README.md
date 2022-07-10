@@ -92,4 +92,21 @@ docker run --rm \
 git remote add mkstream git@github.com:mengkzhaoyun/awecloud-access.git
 
 git push mkstream -f
+
+# 新建一个Tag
+git tag v0.6.0-beagle
+
+# 推送一个Tag ，-f 强制更新
+git push -f mkstream v0.6.0-beagle
+
+# 删除本地Tag
+git tag -d v0.6.0-beagle
+```
+
+```yaml
+require (
+ github.com/fatedier/frp v0.43.0
+)
+
+replace github.com/fatedier/frp => github.com/mengkzhaoyun/awecloud-access v0.6.0-beagle
 ```
