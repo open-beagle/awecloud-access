@@ -85,3 +85,11 @@ docker run --rm \
   -w $(pwd) \
   registry.cn-qingdao.aliyuncs.com/wod/devops-s3-cache:1.0
 ```
+
+## mengkzhaoyun/awecloud-access
+
+```bash
+git remote add mkstream git@github.com:mengkzhaoyun/awecloud-access.git
+
+git push mkstream -f
+```
