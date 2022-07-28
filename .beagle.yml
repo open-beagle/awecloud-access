@@ -362,10 +362,6 @@ trigger:
 platform:
   runner: 10.11.92.40
 
-workspace:
-  base: /go
-  path: src/github.com/fatedier/frp
-
 volumes:
   - name: docker
     host:
