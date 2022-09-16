@@ -7,7 +7,7 @@ git remote add upstream git@github.com:fatedier/frp.git
 
 git fetch upstream
 
-git merge v0.43.0
+git merge v0.44.0
 ```
 
 ## debug
@@ -16,7 +16,6 @@ git merge v0.43.0
 # server
 docker run \
 --rm \
--v $GOPATH/pkg/:/go/pkg \
 -v $PWD/:/go/src/github.com/fatedier/frp \
 -e PLUGIN_BINARY=awecloud-access-server \
 -e PLUGIN_MAIN=cmd/frps \
@@ -30,7 +29,6 @@ $PWD/dist/awecloud-access-server-linux-amd64 -c $PWD/.vscode/frps.ini
 # client
 docker run \
 --rm \
--v $GOPATH/pkg/:/go/pkg \
 -v $PWD/:/go/src/github.com/fatedier/frp \
 -e PLUGIN_BINARY=awecloud-access-client \
 -e PLUGIN_MAIN=cmd/frpc \
@@ -56,7 +54,7 @@ docker run -it --rm \
 -v $PWD/:/go/src/github.com/fatedier/frp \
 -w /go/src/github.com/fatedier/frp \
 registry.cn-qingdao.aliyuncs.com/wod/golang:1.17-alpine \
-go mod vendor
+rm -rf vendor && go mod tidy && go mod vendor
 
 # 构建缓存-->推送缓存至服务器
 docker run --rm \
@@ -105,7 +103,7 @@ git tag -d v0.6.0-beagle
 
 ```yaml
 require (
- github.com/fatedier/frp v0.43.0
+github.com/fatedier/frp v0.43.0
 )
 
 replace github.com/fatedier/frp => github.com/mengkzhaoyun/awecloud-access v0.6.0-beagle
