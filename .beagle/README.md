@@ -84,18 +84,18 @@ docker run --rm \
   registry.cn-qingdao.aliyuncs.com/wod/devops-s3-cache:1.0
 ```
 
-## mengkzhaoyun/awecloud-access
+## open-beagle/awecloud-access
 
 ```bash
-git remote add mkstream git@github.com:mengkzhaoyun/awecloud-access.git
+git remote add openbeagle git@github.com:open-beagle/awecloud-access.git
 
-git push mkstream -f
+git push openbeagle -f
 
 # 新建一个Tag
 git tag v0.6.0-beagle
 
 # 推送一个Tag ，-f 强制更新
-git push -f mkstream v0.6.0-beagle
+git push -f openbeagle v0.6.0-beagle
 
 # 删除本地Tag
 git tag -d v0.6.0-beagle
@@ -106,5 +106,5 @@ require (
 github.com/fatedier/frp v0.43.0
 )
 
-replace github.com/fatedier/frp => github.com/mengkzhaoyun/awecloud-access v0.6.0-beagle
+replace github.com/fatedier/frp => github.com/open-beagle/awecloud-access v0.6.0-beagle
 ```
