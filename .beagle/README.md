@@ -103,8 +103,67 @@ git tag -d v0.6.0-beagle
 
 ```yaml
 require (
-github.com/fatedier/frp v0.43.0
+github.com/fatedier/frp v0.44.0
 )
 
 replace github.com/fatedier/frp => github.com/open-beagle/awecloud-access v0.6.0-beagle
+```
+
+## service
+
+/etc/kubernetes/services/k8s-client/README.md
+
+```bash
+# install bin
+mkdir -p /opt/bin
+ln -s /etc/kubernetes/services/k8s-client/awecloud-access-client-v6.0.1-linux-amd64 /opt/bin/awecloud-access-client
+chmod +x /etc/kubernetes/services/k8s-client/awecloud-access-client-v6.0.1-linux-amd64
+
+# install service
+systemctl enable k8s-client
+systemctl start k8s-client
+```
+
+/etc/kubernetes/services/k8s-client/config.ini
+
+```bash
+[common]
+user = <USER>
+
+server_addr = <HOST>
+server_port = 443
+server_path = <path>
+protocol = wss
+token = changeit
+tls_enable = true
+
+[ssh]
+type = tcp
+local_ip = 127.0.0.1
+local_port = 22
+remote_port = <PORT>
+
+[https]
+type=https
+custom_domains=<domain>
+local_port=443
+local_ip=127.0.0.1
+```
+
+/etc/systemd/system/k8s-client.service
+
+```service
+[Unit]
+Description=k8s-client
+Wants=network.target
+
+[Service]
+Restart=always
+RestartSec=10
+
+ExecStart=/opt/bin/awecloud-access-client \
+-c /etc/kubernetes/services/k8s-client/config.ini
+
+[Install]
+WantedBy=multi-user.target
 ```

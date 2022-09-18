@@ -25,7 +25,7 @@
       ],
       "env": {
         // "HTTP_PROXY": "http://127.0.0.1:8888",
-        "SERVER_PATH": "/rms/api"
+        "SERVER_PATH": "<PATH>"
       },      
       "showLog": true
     }
