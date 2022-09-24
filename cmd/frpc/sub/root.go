@@ -18,10 +18,12 @@ import (
 	"fmt"
 	"io/fs"
 	"net"
+	"net/url"
 	"os"
 	"os/signal"
 	"path/filepath"
 	"strconv"
+	"strings"
 	"sync"
 	"syscall"
 	"time"
@@ -193,10 +195,43 @@ func parseClientCommonCfgFromCmd() (cfg config.ClientCommonConf, err error) {
 
 func runClient(cfgFilePath string) error {
 	cfg, pxyCfgs, visitorCfgs, err := config.ParseClientConfig(cfgFilePath)
+	servAddr := cfg.ServerAddr
+	if strings.HasPrefix(servAddr, "http") {
+		servURL, err := url.Parse(servAddr)
+		if err != nil {
+			return err
+		}
+		cfg.ServerAddr = servURL.Hostname()
+		if len(servURL.Port()) == 0 {
+			if servURL.Scheme == "http" {
+				cfg.ServerPort = 80
+			}
+			if servURL.Scheme == "https" {
+				cfg.ServerPort = 443
+			}
+		} else {
+			cfg.ServerPort, err = strconv.Atoi(servURL.Port())
+			if err != nil {
+				return err
+			}
+		}
+		if servURL.Scheme == "http" {
+			cfg.Protocol = "ws"
+		}
+		if servURL.Scheme == "https" {
+			cfg.Protocol = "wss"
+		}
+		if len(servURL.Path) > 0 {
+			cfg.ServerPath = servURL.Path
+		}
+
+	}
+
 	servPath := cfg.ServerPath
 	if len(servPath) > 0 {
 		unet.FrpWebsocketPath = servPath
 	}
+
 	if err != nil {
 		return err
 	}
