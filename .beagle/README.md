@@ -1,6 +1,6 @@
 # upstream
 
-github.com/fatedier/frp
+https://github.com/fatedier/frp
 
 ```bash
 git remote add upstream git@github.com:fatedier/frp.git
@@ -21,7 +21,7 @@ docker run \
 -e PLUGIN_MAIN=cmd/frps \
 -e CI_WORKSPACE=/go/src/github.com/fatedier/frp \
 -w /go/src/github.com/fatedier/frp \
-registry.cn-qingdao.aliyuncs.com/wod/devops-go-arch:1.17-alpine
+registry.cn-qingdao.aliyuncs.com/wod/devops-go-arch:1.19-alpine
 
 # start server
 $PWD/dist/awecloud-access-server-linux-amd64 -c $PWD/.vscode/frps.ini
@@ -34,7 +34,7 @@ docker run \
 -e PLUGIN_MAIN=cmd/frpc \
 -e CI_WORKSPACE=/go/src/github.com/fatedier/frp \
 -w /go/src/github.com/fatedier/frp \
-registry.cn-qingdao.aliyuncs.com/wod/devops-go-arch:1.17-alpine
+registry.cn-qingdao.aliyuncs.com/wod/devops-go-arch:1.19-alpine
 
 # start client
 $PWD/dist/awecloud-access-client-linux-amd64 -c $PWD/.vscode/frpc.ini
@@ -53,7 +53,7 @@ docker run -it --rm \
 -v $GOPATH/pkg/:/go/pkg \
 -v $PWD/:/go/src/github.com/fatedier/frp \
 -w /go/src/github.com/fatedier/frp \
-registry.cn-qingdao.aliyuncs.com/wod/golang:1.17-alpine \
+registry.cn-qingdao.aliyuncs.com/wod/golang:1.19-alpine \
 rm -rf vendor && go mod tidy && go mod vendor
 
 # 构建缓存-->推送缓存至服务器
@@ -62,10 +62,9 @@ docker run --rm \
   -e PLUGIN_ENDPOINT=$PLUGIN_ENDPOINT \
   -e PLUGIN_ACCESS_KEY=$PLUGIN_ACCESS_KEY \
   -e PLUGIN_SECRET_KEY=$PLUGIN_SECRET_KEY \
-  -e DRONE_REPO_OWNER="cloud" \
+  -e DRONE_REPO_OWNER="open-beagle" \
   -e DRONE_REPO_NAME="awecloud-access" \
-  -e DRONE_COMMIT_BRANCH="dev" \
-  -e PLUGIN_MOUNT="./vendor" \
+  -e PLUGIN_MOUNT="./.git,./vendor" \
   -v $(pwd):$(pwd) \
   -w $(pwd) \
   registry.cn-qingdao.aliyuncs.com/wod/devops-s3-cache:1.0
@@ -76,37 +75,11 @@ docker run --rm \
   -e PLUGIN_ENDPOINT=$PLUGIN_ENDPOINT \
   -e PLUGIN_ACCESS_KEY=$PLUGIN_ACCESS_KEY \
   -e PLUGIN_SECRET_KEY=$PLUGIN_SECRET_KEY \
-  -e DRONE_REPO_OWNER="cloud" \
+  -e DRONE_REPO_OWNER="open-beagle" \
   -e DRONE_REPO_NAME="awecloud-access" \
-  -e DRONE_COMMIT_BRANCH="dev" \
   -v $(pwd):$(pwd) \
   -w $(pwd) \
   registry.cn-qingdao.aliyuncs.com/wod/devops-s3-cache:1.0
-```
-
-## open-beagle/awecloud-access
-
-```bash
-git remote add openbeagle git@github.com:open-beagle/awecloud-access.git
-
-git push openbeagle -f
-
-# 新建一个Tag
-git tag v0.6.0-beagle
-
-# 推送一个Tag ，-f 强制更新
-git push -f openbeagle v0.6.0-beagle
-
-# 删除本地Tag
-git tag -d v0.6.0-beagle
-```
-
-```yaml
-require (
-github.com/fatedier/frp v0.44.0
-)
-
-replace github.com/fatedier/frp => github.com/open-beagle/awecloud-access v0.6.0-beagle
 ```
 
 ## service

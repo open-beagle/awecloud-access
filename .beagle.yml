@@ -5,9 +5,6 @@ trigger:
   branch:
     - dev
 
-platform:
-  runner: 10.11.92.36
-
 workspace:
   path: /go/src/github.com/fatedier/frp
 
@@ -20,23 +17,27 @@ clone:
   disable: true
 
 steps:
-  - name: fetch
-    image: registry.cn-qingdao.aliyuncs.com/wod/devops-git:1.0
-
   - name: s3-cache
     image: registry.cn-qingdao.aliyuncs.com/wod/devops-s3-cache:1.0
     settings:
       restore: true
       mount:
+        - ./.git
         - ./vendor
-      endpoint: http://cache.wodcloud.com
+      endpoint: https://cache.wodcloud.com
       access_key:
         from_secret: ACCESS_KEY_MINIO
       secret_key:
         from_secret: SECRET_KEY_MINIO
 
+  - name: fetch
+    image: registry.cn-qingdao.aliyuncs.com/wod/devops-git:1.0
+    settings:
+      proxy:
+        from_secret: SOCKS5_PROXY
+
   - name: build-go
-    image: registry.cn-qingdao.aliyuncs.com/wod/devops-go-arch:1.17-alpine
+    image: registry.cn-qingdao.aliyuncs.com/wod/devops-go-arch:1.19-alpine
     settings:
       binary: awecloud-access-client
       main: cmd/frpc
@@ -135,9 +136,6 @@ trigger:
   branch:
     - master
 
-platform:
-  runner: 10.11.92.36
-
 volumes:
   - name: docker
     host:
@@ -225,9 +223,6 @@ trigger:
   branch:
     - dev
 
-platform:
-  runner: 10.11.92.40
-
 workspace:
   path: /go/src/github.com/fatedier/frp
 
@@ -240,23 +235,26 @@ clone:
   disable: true
 
 steps:
-  - name: fetch
-    image: registry.cn-qingdao.aliyuncs.com/wod/devops-git:1.0
-
   - name: s3-cache
     image: registry.cn-qingdao.aliyuncs.com/wod/devops-s3-cache:1.0
     settings:
       restore: true
       mount:
+        - ./.git
         - ./vendor
-      endpoint: http://cache.wodcloud.com
+      endpoint: https://cache.wodcloud.com
       access_key:
         from_secret: ACCESS_KEY_MINIO
       secret_key:
         from_secret: SECRET_KEY_MINIO
 
+  - name: fetch
+    image: registry.cn-qingdao.aliyuncs.com/wod/devops-git:1.0
+    settings:
+      proxy:
+        from_secret: SOCKS5_PROXY
   - name: build-go
-    image: registry.cn-qingdao.aliyuncs.com/wod/devops-go-arch:1.17-alpine
+    image: registry.cn-qingdao.aliyuncs.com/wod/devops-go-arch:1.19-alpine
     settings:
       binary: awecloud-access-server
       main: cmd/frps
@@ -355,9 +353,6 @@ trigger:
   branch:
     - master
 
-platform:
-  runner: 10.11.92.40
-
 volumes:
   - name: docker
     host:
@@ -439,28 +434,35 @@ steps:
 
 ---
 kind: secret
+name: SOCKS5_PROXY
+get:
+  name: SOCKS5_PROXY
+  path: devops-secrets
+
+---
+kind: secret
 name: REGISTRY_USER_ALIYUN
 get:
-  name: USERNAME
-  path: devops-registry-aliyun
+  name: REGISTRY_USER_ALIYUN
+  path: devops-secrets
 
 ---
 kind: secret
 name: REGISTRY_PASSWORD_ALIYUN
 get:
-  name: PASSWORD
-  path: devops-registry-aliyun
+  name: REGISTRY_PASSWORD_ALIYUN
+  path: devops-secrets
 
 ---
 kind: secret
 name: ACCESS_KEY_MINIO
 get:
-  name: ACCESS_KEY
-  path: devops-minio
+  name: ACCESS_KEY_MINIO
+  path: devops-secrets
 
 ---
 kind: secret
 name: SECRET_KEY_MINIO
 get:
-  name: SECRET_KEY
-  path: devops-minio
+  name: SECRET_KEY_MINIO
+  path: devops-secrets
