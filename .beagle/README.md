@@ -1,6 +1,6 @@
 # upstream
 
-https://github.com/fatedier/frp
+<https://github.com/fatedier/frp>
 
 ```bash
 git remote add upstream git@github.com:fatedier/frp.git
