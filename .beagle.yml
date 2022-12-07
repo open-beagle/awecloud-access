@@ -230,6 +230,7 @@ steps:
     settings:
       proxy:
         from_secret: SOCKS5_PROXY
+
   - name: build-go
     image: registry.cn-qingdao.aliyuncs.com/wod/devops-go-arch:1.19-alpine
     settings:
@@ -373,7 +374,7 @@ steps:
       registry_user:
         from_secret: REGISTRY_USER_ALIYUN
       registry_password:
-        from_secret: REGISTRY_PASSWORD_ALIYUN
+        from_secret: REGISTRY_PASSWORD_ALIYUN 
 
   - name: harbor-arch
     image: registry.cn-qingdao.aliyuncs.com/wod/devops-docker-manifest:1.0
