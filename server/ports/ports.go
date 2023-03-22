@@ -27,12 +27,14 @@ type PortCtx struct {
 	Port       int
 	Closed     bool
 	UpdateTime time.Time
+	Type       string
 }
 
 type Manager struct {
 	reservedPorts map[string]*PortCtx
 	usedPorts     map[int]*PortCtx
 	freePorts     map[int]struct{}
+	staticPorts   map[int]struct{}
 
 	bindAddr string
 	netType  string
@@ -44,6 +46,7 @@ func NewManager(netType string, bindAddr string, allowPorts map[int]struct{}) *M
 		reservedPorts: make(map[string]*PortCtx),
 		usedPorts:     make(map[int]*PortCtx),
 		freePorts:     make(map[int]struct{}),
+		staticPorts:   make(map[int]struct{}),
 		bindAddr:      bindAddr,
 		netType:       netType,
 	}
@@ -58,6 +61,22 @@ func NewManager(netType string, bindAddr string, allowPorts map[int]struct{}) *M
 	}
 	go pm.cleanReservedPortsWorker()
 	return pm
+}
+
+func (pm *Manager) SetReservedPort(name string, port int) (err error) {
+	portCtx := &PortCtx{
+		ProxyName:  name,
+		Closed:     false,
+		UpdateTime: time.Now(),
+		Port:       port,
+		Type:       "static",
+	}
+	if pm.isPortAvailable(port) {
+		pm.reservedPorts[name] = portCtx
+		pm.usedPorts[port] = portCtx
+		pm.staticPorts[port] = struct{}{}
+	}
+	return nil
 }
 
 func (pm *Manager) Acquire(name string, port int) (realPort int, err error) {
@@ -95,6 +114,9 @@ func (pm *Manager) Acquire(name string, port int) (realPort int, err error) {
 		count := 0
 		maxTryTimes := 5
 		for k := range pm.freePorts {
+			if _, exsit := pm.staticPorts[port]; exsit {
+				continue
+			}
 			count++
 			if count > maxTryTimes {
 				break
@@ -113,6 +135,12 @@ func (pm *Manager) Acquire(name string, port int) (realPort int, err error) {
 	} else {
 		// specified port
 		if _, ok = pm.freePorts[port]; ok {
+			if _, exsit := pm.staticPorts[port]; exsit {
+				if ctx, resExsit := pm.reservedPorts[name]; resExsit && ctx.Port != port {
+					err = ErrPortUnAvailable
+					return
+				}
+			}
 			if pm.isPortAvailable(port) {
 				realPort = port
 				pm.usedPorts[realPort] = portCtx
@@ -171,7 +199,7 @@ func (pm *Manager) cleanReservedPortsWorker() {
 		time.Sleep(CleanReservedPortsInterval)
 		pm.mu.Lock()
 		for name, ctx := range pm.reservedPorts {
-			if ctx.Closed && time.Since(ctx.UpdateTime) > MaxPortReservedDuration {
+			if ctx.Closed && time.Since(ctx.UpdateTime) > MaxPortReservedDuration && ctx.Type != "static" {
 				delete(pm.reservedPorts, name)
 			}
 		}
