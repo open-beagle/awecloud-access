@@ -7,7 +7,7 @@ git remote add upstream git@github.com:fatedier/frp.git
 
 git fetch upstream
 
-git merge v0.44.0
+git merge v0.49.0
 ```
 
 ## debug
@@ -17,31 +17,33 @@ git merge v0.44.0
 docker run \
 --rm \
 -v $PWD/:/go/src/github.com/fatedier/frp \
--e PLUGIN_BINARY=awecloud-access-server \
--e PLUGIN_MAIN=cmd/frps \
 -e CI_WORKSPACE=/go/src/github.com/fatedier/frp \
 -w /go/src/github.com/fatedier/frp \
-registry.cn-qingdao.aliyuncs.com/wod/devops-go-arch:1.19-alpine
+-e PLUGIN_MAIN=cmd/frps \
+-e PLUGIN_BINARY=awecloud-access-server \
+-e PLUGIN_VERSION=v6.1.0 \
+registry.cn-qingdao.aliyuncs.com/wod/devops-go-arch:1.20-alpine
 
 # start server
-$PWD/dist/awecloud-access-server-linux-amd64 -c $PWD/.vscode/frps.ini
+$PWD/dist/awecloud-access-server-v6.1.0-linux-amd64 -c $PWD/.vscode/frps.ini
 
 # client
 docker run \
 --rm \
 -v $PWD/:/go/src/github.com/fatedier/frp \
--e PLUGIN_BINARY=awecloud-access-client \
--e PLUGIN_MAIN=cmd/frpc \
 -e CI_WORKSPACE=/go/src/github.com/fatedier/frp \
 -w /go/src/github.com/fatedier/frp \
-registry.cn-qingdao.aliyuncs.com/wod/devops-go-arch:1.19-alpine
+-e PLUGIN_MAIN=cmd/frpc \
+-e PLUGIN_BINARY=awecloud-access-client \
+-e PLUGIN_VERSION=v6.1.0 \
+registry.cn-qingdao.aliyuncs.com/wod/devops-go-arch:1.20-alpine
 
 # start client
-$PWD/dist/awecloud-access-client-linux-amd64 -c $PWD/.vscode/frpc.ini
+$PWD/dist/awecloud-access-client-v6.1.0-linux-amd64 -c $PWD/.vscode/frpc.ini
 
 # windows
 CGO_ENABLED=0 GOOS=windows GOARCH=amd64 \
-go build -o $PWD/dist/awecloud-access-client.exe \
+go build -o $PWD/dist/awecloud-access-client-v6.1.0.exe \
 cmd/frpc/main.go
 ```
 
@@ -50,10 +52,9 @@ cmd/frpc/main.go
 ```bash
 # 构建缓存-->Golang
 docker run -it --rm \
--v $GOPATH/pkg/:/go/pkg \
 -v $PWD/:/go/src/github.com/fatedier/frp \
 -w /go/src/github.com/fatedier/frp \
-registry.cn-qingdao.aliyuncs.com/wod/golang:1.19-alpine \
+registry.cn-qingdao.aliyuncs.com/wod/golang:1.20-alpine \
 rm -rf vendor && go mod tidy && go mod vendor
 
 # 构建缓存-->推送缓存至服务器
@@ -89,8 +90,8 @@ docker run --rm \
 ```bash
 # install bin
 mkdir -p /opt/bin
-ln -s /etc/kubernetes/services/k8s-client/awecloud-access-client-v6.0.1-linux-amd64 /opt/bin/awecloud-access-client
-chmod +x /etc/kubernetes/services/k8s-client/awecloud-access-client-v6.0.1-linux-amd64
+ln -s /etc/kubernetes/services/k8s-client/awecloud-access-client-v6.1.0-linux-amd64 /opt/bin/awecloud-access-client
+chmod +x /etc/kubernetes/services/k8s-client/awecloud-access-client-v6.1.0-linux-amd64
 
 # install service
 systemctl enable k8s-client

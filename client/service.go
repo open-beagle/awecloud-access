@@ -452,6 +452,9 @@ func (cm *ConnectionManager) realConnect() (net.Conn, error) {
 	if protocol == "websocket" {
 		protocol = "tcp"
 		dialOptions = append(dialOptions, libdial.WithAfterHook(libdial.AfterHook{Hook: frpNet.DialHookWebsocket()}))
+	} else if protocol == "wss" {
+		protocol = "tcp"
+		dialOptions = append(dialOptions, libdial.WithAfterHook(libdial.AfterHook{Hook: frpNet.DialHookWSS()}))
 	}
 	if cm.cfg.ConnectServerLocalIP != "" {
 		dialOptions = append(dialOptions, libdial.WithLocalAddr(cm.cfg.ConnectServerLocalIP))

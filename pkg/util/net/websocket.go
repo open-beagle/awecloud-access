@@ -10,10 +10,7 @@ import (
 )
 
 var ErrWebsocketListenerClosed = errors.New("websocket listener closed")
-
-const (
-	FrpWebsocketPath = "/rms/api"
-)
+var FrpWebsocketPath = "/rms/api"
 
 type WebsocketListener struct {
 	ln       net.Listener
