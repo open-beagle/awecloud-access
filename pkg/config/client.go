@@ -20,10 +20,10 @@ import (
 	"path/filepath"
 	"strings"
 
+	"gopkg.in/ini.v1"
+
 	"github.com/fatedier/frp/pkg/auth"
 	"github.com/fatedier/frp/pkg/util/util"
-
-	"gopkg.in/ini.v1"
 )
 
 // ClientCommonConf contains information for a client service. It is
@@ -41,6 +41,8 @@ type ClientCommonConf struct {
 	// ServerPath specifies the path to connect to the server on. By default,
 	// this value is empty.
 	ServerPath string `ini:"server_path" json:"server_path"`
+	// STUN server to help penetrate NAT hole.
+	NatHoleSTUNServer string `ini:"nat_hole_stun_server" json:"nat_hole_stun_server"`
 	// The maximum amount of time a dial to server will wait for a connect to complete.
 	DialServerTimeout int64 `ini:"dial_server_timeout" json:"dial_server_timeout"`
 	// DialServerKeepAlive specifies the interval between keep-alive probes for an active network connection between frpc and frps.
@@ -116,11 +118,15 @@ type ClientCommonConf struct {
 	// all supplied proxies are enabled. By default, this value is an empty
 	// set.
 	Start []string `ini:"start" json:"start"`
-	//Start map[string]struct{} `json:"start"`
+	// Start map[string]struct{} `json:"start"`
 	// Protocol specifies the protocol to use when interacting with the server.
-	// Valid values are "tcp", "kcp" and "websocket". By default, this value
+	// Valid values are "tcp", "kcp", "quic" and "websocket". By default, this value
 	// is "tcp".
 	Protocol string `ini:"protocol" json:"protocol"`
+	// QUIC protocol options
+	QUICKeepalivePeriod    int `ini:"quic_keepalive_period" json:"quic_keepalive_period" validate:"gte=0"`
+	QUICMaxIdleTimeout     int `ini:"quic_max_idle_timeout" json:"quic_max_idle_timeout" validate:"gte=0"`
+	QUICMaxIncomingStreams int `ini:"quic_max_incoming_streams" json:"quic_max_incoming_streams" validate:"gte=0"`
 	// TLSEnable specifies whether or not TLS should be used when communicating
 	// with the server. If "tls_cert_file" and "tls_key_file" are valid,
 	// client will load the supplied tls configuration.
@@ -168,6 +174,7 @@ func GetDefaultClientConf() ClientCommonConf {
 		ClientConfig:            auth.GetDefaultClientConf(),
 		ServerAddr:              "0.0.0.0",
 		ServerPort:              7000,
+		NatHoleSTUNServer:       "stun.easyvoip.com:3478",
 		DialServerTimeout:       10,
 		DialServerKeepAlive:     7200,
 		HTTPProxy:               os.Getenv("http_proxy"),
@@ -175,30 +182,21 @@ func GetDefaultClientConf() ClientCommonConf {
 		LogWay:                  "console",
 		LogLevel:                "info",
 		LogMaxDays:              3,
-		DisableLogColor:         false,
 		AdminAddr:               "127.0.0.1",
-		AdminPort:               0,
-		AdminUser:               "",
-		AdminPwd:                "",
-		AssetsDir:               "",
 		PoolCount:               1,
 		TCPMux:                  true,
 		TCPMuxKeepaliveInterval: 60,
-		User:                    "",
-		DNSServer:               "",
 		LoginFailExit:           true,
 		Start:                   make([]string, 0),
 		Protocol:                "tcp",
-		TLSEnable:               false,
-		TLSCertFile:             "",
-		TLSKeyFile:              "",
-		TLSTrustedCaFile:        "",
+		QUICKeepalivePeriod:     10,
+		QUICMaxIdleTimeout:      30,
+		QUICMaxIncomingStreams:  100000,
 		HeartbeatInterval:       30,
 		HeartbeatTimeout:        90,
 		Metas:                   make(map[string]string),
 		UDPPacketSize:           1500,
 		IncludeConfigFiles:      make([]string, 0),
-		PprofEnable:             false,
 	}
 }
 
@@ -217,7 +215,7 @@ func (cfg *ClientCommonConf) Validate() error {
 		}
 	}
 
-	if cfg.TLSEnable == false {
+	if !cfg.TLSEnable {
 		if cfg.TLSCertFile != "" {
 			fmt.Println("WARNING! tls_cert_file is invalid when tls_enable is false")
 		}
@@ -231,7 +229,7 @@ func (cfg *ClientCommonConf) Validate() error {
 		}
 	}
 
-	if cfg.Protocol != "tcp" && cfg.Protocol != "kcp" && cfg.Protocol != "websocket" && cfg.Protocol != "wss" {
+	if cfg.Protocol != "tcp" && cfg.Protocol != "kcp" && cfg.Protocol != "websocket" && cfg.Protocol != "quic" && cfg.Protocol != "wss" {
 		return fmt.Errorf("invalid protocol")
 	}
 
@@ -284,7 +282,6 @@ func LoadAllProxyConfsFromIni(
 	source interface{},
 	start []string,
 ) (map[string]ProxyConf, map[string]VisitorConf, error) {
-
 	f, err := ini.LoadSources(ini.LoadOptions{
 		Insensitive:         false,
 		InsensitiveSections: false,
@@ -369,7 +366,6 @@ func LoadAllProxyConfsFromIni(
 }
 
 func renderRangeProxyTemplates(f *ini.File, section *ini.Section) error {
-
 	// Validation
 	localPortStr := section.Key("local_port").String()
 	remotePortStr := section.Key("remote_port").String()
@@ -407,8 +403,12 @@ func renderRangeProxyTemplates(f *ini.File, section *ini.Section) error {
 		}
 
 		copySection(section, tmpsection)
-		tmpsection.NewKey("local_port", fmt.Sprintf("%d", localPorts[i]))
-		tmpsection.NewKey("remote_port", fmt.Sprintf("%d", remotePorts[i]))
+		if _, err := tmpsection.NewKey("local_port", fmt.Sprintf("%d", localPorts[i])); err != nil {
+			return fmt.Errorf("local_port new key in section error: %v", err)
+		}
+		if _, err := tmpsection.NewKey("remote_port", fmt.Sprintf("%d", remotePorts[i])); err != nil {
+			return fmt.Errorf("remote_port new key in section error: %v", err)
+		}
 	}
 
 	return nil
@@ -416,6 +416,6 @@ func renderRangeProxyTemplates(f *ini.File, section *ini.Section) error {
 
 func copySection(source, target *ini.Section) {
 	for key, value := range source.KeysHash() {
-		target.NewKey(key, value)
+		_, _ = target.NewKey(key, value)
 	}
 }

@@ -1,37 +1,20 @@
 # frp
 
-[![Build Status](https://travis-ci.org/fatedier/frp.svg?branch=master)](https://travis-ci.org/fatedier/frp)
+[![Build Status](https://circleci.com/gh/fatedier/frp.svg?style=shield)](https://circleci.com/gh/fatedier/frp)
 [![GitHub release](https://img.shields.io/github/tag/fatedier/frp.svg?label=release)](https://github.com/fatedier/frp/releases)
 
 [README](README.md) | [中文文档](README_zh.md)
 
 frp 是一个专注于内网穿透的高性能的反向代理应用，支持 TCP、UDP、HTTP、HTTPS 等多种协议。可以将内网服务以安全、便捷的方式通过具有公网 IP 节点的中转暴露到公网。
 
-<h3 align="center">Platinum Sponsors</h3>
-<!--platinum sponsors start-->
-
-<p align="center">
-  <a href="https://www.doppler.com/?utm_campaign=github_repo&utm_medium=referral&utm_content=frp&utm_source=github" target="_blank">
-    <img width="400px" src="https://raw.githubusercontent.com/fatedier/frp/dev/doc/pic/sponsor_doppler.png">
-  </a>
-</p>
-
-<!--platinum sponsors end-->
-
 <h3 align="center">Gold Sponsors</h3>
 <!--gold sponsors start-->
-
 <p align="center">
   <a href="https://workos.com/?utm_campaign=github_repo&utm_medium=referral&utm_content=frp&utm_source=github" target="_blank">
-    <img width="300px" src="https://raw.githubusercontent.com/fatedier/frp/dev/doc/pic/sponsor_workos.png">
+    <img width="350px" src="https://raw.githubusercontent.com/fatedier/frp/dev/doc/pic/sponsor_workos.png">
   </a>
 </p>
-
 <!--gold sponsors end-->
-
-<h3 align="center">Silver Sponsors</h3>
-
-* Sakura Frp - 欢迎点击 "加入我们"
 
 ## 为什么使用 frp ？
 

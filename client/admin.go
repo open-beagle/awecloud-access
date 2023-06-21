@@ -20,10 +20,10 @@ import (
 	"net/http/pprof"
 	"time"
 
+	"github.com/gorilla/mux"
+
 	"github.com/fatedier/frp/assets"
 	frpNet "github.com/fatedier/frp/pkg/util/net"
-
-	"github.com/gorilla/mux"
 )
 
 var (
@@ -48,7 +48,7 @@ func (svr *Service) RunAdminServer(address string) (err error) {
 
 	subRouter := router.NewRoute().Subrouter()
 	user, passwd := svr.cfg.AdminUser, svr.cfg.AdminPwd
-	subRouter.Use(frpNet.NewHTTPAuthMiddleware(user, passwd).Middleware)
+	subRouter.Use(frpNet.NewHTTPAuthMiddleware(user, passwd).SetAuthFailDelay(200 * time.Millisecond).Middleware)
 
 	// api, see admin_api.go
 	subRouter.HandleFunc("/api/reload", svr.apiReload).Methods("GET")
@@ -77,6 +77,8 @@ func (svr *Service) RunAdminServer(address string) (err error) {
 		return err
 	}
 
-	go server.Serve(ln)
+	go func() {
+		_ = server.Serve(ln)
+	}()
 	return
 }

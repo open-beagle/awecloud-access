@@ -4,6 +4,9 @@ import (
 	"crypto/tls"
 	"fmt"
 	"strings"
+	"time"
+
+	"github.com/onsi/ginkgo/v2"
 
 	"github.com/fatedier/frp/pkg/transport"
 	"github.com/fatedier/frp/test/e2e/framework"
@@ -12,18 +15,16 @@ import (
 	"github.com/fatedier/frp/test/e2e/mock/server/streamserver"
 	"github.com/fatedier/frp/test/e2e/pkg/port"
 	"github.com/fatedier/frp/test/e2e/pkg/request"
-
-	. "github.com/onsi/ginkgo"
 )
 
-var _ = Describe("[Feature: Basic]", func() {
+var _ = ginkgo.Describe("[Feature: Basic]", func() {
 	f := framework.NewDefaultFramework()
 
-	Describe("TCP && UDP", func() {
+	ginkgo.Describe("TCP && UDP", func() {
 		types := []string{"tcp", "udp"}
 		for _, t := range types {
 			proxyType := t
-			It(fmt.Sprintf("Expose a %s echo server", strings.ToUpper(proxyType)), func() {
+			ginkgo.It(fmt.Sprintf("Expose a %s echo server", strings.ToUpper(proxyType)), func() {
 				serverConf := consts.DefaultServerConfig
 				clientConf := consts.DefaultClientConfig
 
@@ -93,8 +94,8 @@ var _ = Describe("[Feature: Basic]", func() {
 		}
 	})
 
-	Describe("HTTP", func() {
-		It("proxy to HTTP server", func() {
+	ginkgo.Describe("HTTP", func() {
+		ginkgo.It("proxy to HTTP server", func() {
 			serverConf := consts.DefaultServerConfig
 			vhostHTTPPort := f.AllocPort()
 			serverConf += fmt.Sprintf(`
@@ -175,8 +176,8 @@ var _ = Describe("[Feature: Basic]", func() {
 		})
 	})
 
-	Describe("HTTPS", func() {
-		It("proxy to HTTPS server", func() {
+	ginkgo.Describe("HTTPS", func() {
+		ginkgo.It("proxy to HTTPS server", func() {
 			serverConf := consts.DefaultServerConfig
 			vhostHTTPSPort := f.AllocPort()
 			serverConf += fmt.Sprintf(`
@@ -237,7 +238,7 @@ var _ = Describe("[Feature: Basic]", func() {
 			framework.ExpectNoError(err)
 			localServer := httpserver.New(
 				httpserver.WithBindPort(localPort),
-				httpserver.WithTlsConfig(tlsConfig),
+				httpserver.WithTLSConfig(tlsConfig),
 				httpserver.WithResponse([]byte("test")),
 			)
 			f.RunServer("", localServer)
@@ -275,11 +276,11 @@ var _ = Describe("[Feature: Basic]", func() {
 		})
 	})
 
-	Describe("STCP && SUDP", func() {
-		types := []string{"stcp", "sudp"}
+	ginkgo.Describe("STCP && SUDP && XTCP", func() {
+		types := []string{"stcp", "sudp", "xtcp"}
 		for _, t := range types {
 			proxyType := t
-			It(fmt.Sprintf("Expose echo server with %s", strings.ToUpper(proxyType)), func() {
+			ginkgo.It(fmt.Sprintf("Expose echo server with %s", strings.ToUpper(proxyType)), func() {
 				serverConf := consts.DefaultServerConfig
 				clientServerConf := consts.DefaultClientConfig
 				clientVisitorConf := consts.DefaultClientConfig
@@ -293,6 +294,9 @@ var _ = Describe("[Feature: Basic]", func() {
 				case "sudp":
 					localPortName = framework.UDPEchoServerPort
 					protocol = "udp"
+				case "xtcp":
+					localPortName = framework.TCPEchoServerPort
+					protocol = "tcp"
 				}
 
 				correctSK := "abc"
@@ -371,6 +375,9 @@ var _ = Describe("[Feature: Basic]", func() {
 
 				for _, test := range tests {
 					framework.NewRequestExpect(f).
+						RequestModify(func(r *request.Request) {
+							r.Timeout(5 * time.Second)
+						}).
 						Protocol(protocol).
 						PortName(test.bindPortName).
 						Explain(test.proxyName).
@@ -381,8 +388,8 @@ var _ = Describe("[Feature: Basic]", func() {
 		}
 	})
 
-	Describe("TCPMUX", func() {
-		It("Type tcpmux", func() {
+	ginkgo.Describe("TCPMUX", func() {
+		ginkgo.It("Type tcpmux", func() {
 			serverConf := consts.DefaultServerConfig
 			clientConf := consts.DefaultClientConfig
 

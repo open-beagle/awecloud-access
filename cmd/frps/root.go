@@ -18,16 +18,14 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/spf13/cobra"
+
 	"github.com/fatedier/frp/pkg/auth"
 	"github.com/fatedier/frp/pkg/config"
 	"github.com/fatedier/frp/pkg/util/log"
 	"github.com/fatedier/frp/pkg/util/util"
 	"github.com/fatedier/frp/pkg/util/version"
 	"github.com/fatedier/frp/server"
-
-	"github.com/spf13/cobra"
-
-	unet "github.com/fatedier/frp/pkg/util/net"
 )
 
 const (
@@ -41,7 +39,6 @@ var (
 
 	bindAddr             string
 	bindPort             int
-	bindUDPPort          int
 	kcpBindPort          int
 	proxyBindAddr        string
 	vhostHTTPPort        int
@@ -52,16 +49,13 @@ var (
 	dashboardUser        string
 	dashboardPwd         string
 	enablePrometheus     bool
-	assetsDir            string
 	logFile              string
 	logLevel             string
 	logMaxDays           int64
 	disableLogColor      bool
 	token                string
 	subDomainHost        string
-	tcpMux               bool
 	allowPorts           string
-	maxPoolCount         int64
 	maxPortsPerClient    int64
 	tlsOnly              bool
 	dashboardTLSMode     bool
@@ -75,13 +69,12 @@ func init() {
 
 	rootCmd.PersistentFlags().StringVarP(&bindAddr, "bind_addr", "", "0.0.0.0", "bind address")
 	rootCmd.PersistentFlags().IntVarP(&bindPort, "bind_port", "p", 7000, "bind port")
-	rootCmd.PersistentFlags().IntVarP(&bindUDPPort, "bind_udp_port", "", 0, "bind udp port")
 	rootCmd.PersistentFlags().IntVarP(&kcpBindPort, "kcp_bind_port", "", 0, "kcp bind udp port")
 	rootCmd.PersistentFlags().StringVarP(&proxyBindAddr, "proxy_bind_addr", "", "0.0.0.0", "proxy bind address")
 	rootCmd.PersistentFlags().IntVarP(&vhostHTTPPort, "vhost_http_port", "", 0, "vhost http port")
 	rootCmd.PersistentFlags().IntVarP(&vhostHTTPSPort, "vhost_https_port", "", 0, "vhost https port")
 	rootCmd.PersistentFlags().Int64VarP(&vhostHTTPTimeout, "vhost_http_timeout", "", 60, "vhost http response header timeout")
-	rootCmd.PersistentFlags().StringVarP(&dashboardAddr, "dashboard_addr", "", "0.0.0.0", "dasboard address")
+	rootCmd.PersistentFlags().StringVarP(&dashboardAddr, "dashboard_addr", "", "0.0.0.0", "dashboard address")
 	rootCmd.PersistentFlags().IntVarP(&dashboardPort, "dashboard_port", "", 0, "dashboard port")
 	rootCmd.PersistentFlags().StringVarP(&dashboardUser, "dashboard_user", "", "admin", "dashboard user")
 	rootCmd.PersistentFlags().StringVarP(&dashboardPwd, "dashboard_pwd", "", "admin", "dashboard password")
@@ -158,7 +151,7 @@ func parseServerCommonCfg(fileType int, source []byte) (cfg config.ServerCommonC
 	cfg.Complete()
 	err = cfg.Validate()
 	if err != nil {
-		err = fmt.Errorf("Parse config error: %v", err)
+		err = fmt.Errorf("parse config error: %v", err)
 		return
 	}
 	return
@@ -169,7 +162,6 @@ func parseServerCommonCfgFromCmd() (cfg config.ServerCommonConf, err error) {
 
 	cfg.BindAddr = bindAddr
 	cfg.BindPort = bindPort
-	cfg.BindUDPPort = bindUDPPort
 	cfg.KCPBindPort = kcpBindPort
 	cfg.ProxyBindAddr = proxyBindAddr
 	cfg.VhostHTTPPort = vhostHTTPPort
@@ -196,7 +188,7 @@ func parseServerCommonCfgFromCmd() (cfg config.ServerCommonConf, err error) {
 		// e.g. 1000-2000,2001,2002,3000-4000
 		ports, errRet := util.ParseRangeNumbers(allowPorts)
 		if errRet != nil {
-			err = fmt.Errorf("Parse conf error: allow_ports: %v", errRet)
+			err = fmt.Errorf("parse conf error: allow_ports: %v", errRet)
 			return
 		}
 

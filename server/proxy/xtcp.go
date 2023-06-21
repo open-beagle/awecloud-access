@@ -17,10 +17,11 @@ package proxy
 import (
 	"fmt"
 
+	"github.com/fatedier/golib/errors"
+	"golang.org/x/time/rate"
+
 	"github.com/fatedier/frp/pkg/config"
 	"github.com/fatedier/frp/pkg/msg"
-
-	"github.com/fatedier/golib/errors"
 )
 
 type XTCPProxy struct {
@@ -43,41 +44,20 @@ func (pxy *XTCPProxy) Run() (remoteAddr string, err error) {
 		for {
 			select {
 			case <-pxy.closeCh:
-				break
-			case sidRequest := <-sidCh:
-				sr := sidRequest
+				return
+			case sid := <-sidCh:
 				workConn, errRet := pxy.GetWorkConnFromPool(nil, nil)
 				if errRet != nil {
 					continue
 				}
 				m := &msg.NatHoleSid{
-					Sid: sr.Sid,
+					Sid: sid,
 				}
 				errRet = msg.WriteMsg(workConn, m)
 				if errRet != nil {
 					xl.Warn("write nat hole sid package error, %v", errRet)
-					workConn.Close()
-					break
 				}
-
-				go func() {
-					raw, errRet := msg.ReadMsg(workConn)
-					if errRet != nil {
-						xl.Warn("read nat hole client ok package error: %v", errRet)
-						workConn.Close()
-						return
-					}
-					if _, ok := raw.(*msg.NatHoleClientDetectOK); !ok {
-						xl.Warn("read nat hole client ok package format error")
-						workConn.Close()
-						return
-					}
-
-					select {
-					case sr.NotifyCh <- struct{}{}:
-					default:
-					}
-				}()
+				workConn.Close()
 			}
 		}
 	}()
@@ -88,10 +68,14 @@ func (pxy *XTCPProxy) GetConf() config.ProxyConf {
 	return pxy.cfg
 }
 
+func (pxy *XTCPProxy) GetLimiter() *rate.Limiter {
+	return pxy.limiter
+}
+
 func (pxy *XTCPProxy) Close() {
 	pxy.BaseProxy.Close()
 	pxy.rc.NatHoleController.CloseClient(pxy.GetName())
-	errors.PanicToError(func() {
+	_ = errors.PanicToError(func() {
 		close(pxy.closeCh)
 	})
 }

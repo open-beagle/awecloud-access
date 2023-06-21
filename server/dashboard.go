@@ -21,11 +21,11 @@ import (
 	"net/http/pprof"
 	"time"
 
-	"github.com/fatedier/frp/assets"
-	frpNet "github.com/fatedier/frp/pkg/util/net"
-
 	"github.com/gorilla/mux"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+
+	"github.com/fatedier/frp/assets"
+	frpNet "github.com/fatedier/frp/pkg/util/net"
 )
 
 var (
@@ -50,7 +50,7 @@ func (svr *Service) RunDashboardServer(address string) (err error) {
 	subRouter := router.NewRoute().Subrouter()
 
 	user, passwd := svr.cfg.DashboardUser, svr.cfg.DashboardPwd
-	subRouter.Use(frpNet.NewHTTPAuthMiddleware(user, passwd).Middleware)
+	subRouter.Use(frpNet.NewHTTPAuthMiddleware(user, passwd).SetAuthFailDelay(200 * time.Millisecond).Middleware)
 
 	// metrics
 	if svr.cfg.EnablePrometheus {
@@ -92,6 +92,8 @@ func (svr *Service) RunDashboardServer(address string) (err error) {
 		}
 		ln = tls.NewListener(ln, tlsCfg)
 	}
-	go server.Serve(ln)
+	go func() {
+		_ = server.Serve(ln)
+	}()
 	return
 }

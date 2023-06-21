@@ -1,3 +1,17 @@
+// Copyright 2023 The frp Authors
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package proxy
 
 import (
@@ -9,34 +23,33 @@ import (
 	"github.com/fatedier/frp/client/event"
 	"github.com/fatedier/frp/pkg/config"
 	"github.com/fatedier/frp/pkg/msg"
+	"github.com/fatedier/frp/pkg/transport"
 	"github.com/fatedier/frp/pkg/util/xlog"
-
-	"github.com/fatedier/golib/errors"
 )
 
 type Manager struct {
-	sendCh  chan (msg.Message)
-	proxies map[string]*Wrapper
+	proxies        map[string]*Wrapper
+	msgTransporter transport.MessageTransporter
 
 	closed bool
 	mu     sync.RWMutex
 
 	clientCfg config.ClientCommonConf
 
-	// The UDP port that the server is listening on
-	serverUDPPort int
-
 	ctx context.Context
 }
 
-func NewManager(ctx context.Context, msgSendCh chan (msg.Message), clientCfg config.ClientCommonConf, serverUDPPort int) *Manager {
+func NewManager(
+	ctx context.Context,
+	clientCfg config.ClientCommonConf,
+	msgTransporter transport.MessageTransporter,
+) *Manager {
 	return &Manager{
-		sendCh:        msgSendCh,
-		proxies:       make(map[string]*Wrapper),
-		closed:        false,
-		clientCfg:     clientCfg,
-		serverUDPPort: serverUDPPort,
-		ctx:           ctx,
+		proxies:        make(map[string]*Wrapper),
+		msgTransporter: msgTransporter,
+		closed:         false,
+		clientCfg:      clientCfg,
+		ctx:            ctx,
 	}
 }
 
@@ -75,7 +88,7 @@ func (pm *Manager) HandleWorkConn(name string, workConn net.Conn, m *msg.StartWo
 	}
 }
 
-func (pm *Manager) HandleEvent(evType event.Type, payload interface{}) error {
+func (pm *Manager) HandleEvent(payload interface{}) error {
 	var m msg.Message
 	switch e := payload.(type) {
 	case *event.StartProxyPayload:
@@ -86,10 +99,7 @@ func (pm *Manager) HandleEvent(evType event.Type, payload interface{}) error {
 		return event.ErrPayloadType
 	}
 
-	err := errors.PanicToError(func() {
-		pm.sendCh <- m
-	})
-	return err
+	return pm.msgTransporter.Send(m)
 }
 
 func (pm *Manager) GetAllProxyStatus() []*WorkingStatus {
@@ -113,10 +123,8 @@ func (pm *Manager) Reload(pxyCfgs map[string]config.ProxyConf) {
 		cfg, ok := pxyCfgs[name]
 		if !ok {
 			del = true
-		} else {
-			if !pxy.Cfg.Compare(cfg) {
-				del = true
-			}
+		} else if !pxy.Cfg.Compare(cfg) {
+			del = true
 		}
 
 		if del {
@@ -133,7 +141,7 @@ func (pm *Manager) Reload(pxyCfgs map[string]config.ProxyConf) {
 	addPxyNames := make([]string, 0)
 	for name, cfg := range pxyCfgs {
 		if _, ok := pm.proxies[name]; !ok {
-			pxy := NewWrapper(pm.ctx, cfg, pm.clientCfg, pm.HandleEvent, pm.serverUDPPort)
+			pxy := NewWrapper(pm.ctx, cfg, pm.clientCfg, pm.HandleEvent, pm.msgTransporter)
 			pm.proxies[name] = pxy
 			addPxyNames = append(addPxyNames, name)
 

@@ -17,10 +17,10 @@ package config
 import (
 	"testing"
 
-	"github.com/fatedier/frp/pkg/consts"
-
 	"github.com/stretchr/testify/assert"
 	"gopkg.in/ini.v1"
+
+	"github.com/fatedier/frp/pkg/consts"
 )
 
 const testVisitorPrefix = "test."
@@ -87,6 +87,9 @@ func Test_Visitor_UnmarshalFromIni(t *testing.T) {
 					BindAddr:   "127.0.0.1",
 					BindPort:   9001,
 				},
+				Protocol:         "quic",
+				MaxRetriesAnHour: 8,
+				MinRetryInterval: 90,
 			},
 		},
 	}

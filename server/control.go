@@ -23,22 +23,23 @@ import (
 	"sync"
 	"time"
 
+	"github.com/fatedier/golib/control/shutdown"
+	"github.com/fatedier/golib/crypto"
+	"github.com/fatedier/golib/errors"
+
 	"github.com/fatedier/frp/pkg/auth"
 	"github.com/fatedier/frp/pkg/config"
 	"github.com/fatedier/frp/pkg/consts"
 	frpErr "github.com/fatedier/frp/pkg/errors"
 	"github.com/fatedier/frp/pkg/msg"
 	plugin "github.com/fatedier/frp/pkg/plugin/server"
+	"github.com/fatedier/frp/pkg/transport"
 	"github.com/fatedier/frp/pkg/util/util"
 	"github.com/fatedier/frp/pkg/util/version"
 	"github.com/fatedier/frp/pkg/util/xlog"
 	"github.com/fatedier/frp/server/controller"
 	"github.com/fatedier/frp/server/metrics"
 	"github.com/fatedier/frp/server/proxy"
-
-	"github.com/fatedier/golib/control/shutdown"
-	"github.com/fatedier/golib/crypto"
-	"github.com/fatedier/golib/errors"
 )
 
 type ControlManager struct {
@@ -82,6 +83,16 @@ func (cm *ControlManager) GetByID(runID string) (ctl *Control, ok bool) {
 	return
 }
 
+func (cm *ControlManager) Close() error {
+	cm.mu.Lock()
+	defer cm.mu.Unlock()
+	for _, ctl := range cm.ctlsByRunID {
+		ctl.Close()
+	}
+	cm.ctlsByRunID = make(map[string]*Control)
+	return nil
+}
+
 type Control struct {
 	// all resource managers and controllers
 	rc *controller.ResourceController
@@ -94,6 +105,9 @@ type Control struct {
 
 	// verifies authentication based on selected method
 	authVerifier auth.Verifier
+
+	// other components can use this to communicate with client
+	msgTransporter transport.MessageTransporter
 
 	// login message
 	loginMsg *msg.Login
@@ -154,12 +168,11 @@ func NewControl(
 	loginMsg *msg.Login,
 	serverCfg config.ServerCommonConf,
 ) *Control {
-
 	poolCount := loginMsg.PoolCount
 	if poolCount > int(serverCfg.MaxPoolCount) {
 		poolCount = int(serverCfg.MaxPoolCount)
 	}
-	return &Control{
+	ctl := &Control{
 		rc:              rc,
 		pxyManager:      pxyManager,
 		pluginManager:   pluginManager,
@@ -183,17 +196,18 @@ func NewControl(
 		xl:              xlog.FromContextSafe(ctx),
 		ctx:             ctx,
 	}
+	ctl.msgTransporter = transport.NewMessageTransporter(ctl.sendCh)
+	return ctl
 }
 
 // Start send a login success message to client and start working.
 func (ctl *Control) Start() {
 	loginRespMsg := &msg.LoginResp{
-		Version:       version.Full(),
-		RunID:         ctl.runID,
-		ServerUDPPort: ctl.serverCfg.BindUDPPort,
-		Error:         "",
+		Version: version.Full(),
+		RunID:   ctl.runID,
+		Error:   "",
 	}
-	msg.WriteMsg(ctl.conn, loginRespMsg)
+	_ = msg.WriteMsg(ctl.conn, loginRespMsg)
 
 	go ctl.writer()
 	for i := 0; i < ctl.poolCount; i++ {
@@ -203,6 +217,18 @@ func (ctl *Control) Start() {
 	go ctl.manager()
 	go ctl.reader()
 	go ctl.stoper()
+}
+
+func (ctl *Control) Close() error {
+	ctl.allShutdown.Start()
+	return nil
+}
+
+func (ctl *Control) Replaced(newCtl *Control) {
+	xl := ctl.xl
+	xl.Info("Replaced by client [%s]", newCtl.runID)
+	ctl.runID = ""
+	ctl.allShutdown.Start()
 }
 
 func (ctl *Control) RegisterWorkConn(conn net.Conn) error {
@@ -270,17 +296,10 @@ func (ctl *Control) GetWorkConn() (workConn net.Conn, err error) {
 	}
 
 	// When we get a work connection from pool, replace it with a new one.
-	errors.PanicToError(func() {
+	_ = errors.PanicToError(func() {
 		ctl.sendCh <- &msg.ReqWorkConn{}
 	})
 	return
-}
-
-func (ctl *Control) Replaced(newCtl *Control) {
-	xl := ctl.xl
-	xl.Info("Replaced by client [%s]", newCtl.runID)
-	ctl.runID = ""
-	ctl.allShutdown.Start()
 }
 
 func (ctl *Control) writer() {
@@ -388,7 +407,7 @@ func (ctl *Control) stoper() {
 			},
 		}
 		go func() {
-			ctl.pluginManager.CloseProxy(notifyContent)
+			_ = ctl.pluginManager.CloseProxy(notifyContent)
 		}()
 	}
 
@@ -466,8 +485,14 @@ func (ctl *Control) manager() {
 					metrics.Server.NewProxy(m.ProxyName, m.ProxyType)
 				}
 				ctl.sendCh <- resp
+			case *msg.NatHoleVisitor:
+				go ctl.HandleNatHoleVisitor(m)
+			case *msg.NatHoleClient:
+				go ctl.HandleNatHoleClient(m)
+			case *msg.NatHoleReport:
+				go ctl.HandleNatHoleReport(m)
 			case *msg.CloseProxy:
-				ctl.CloseProxy(m)
+				_ = ctl.CloseProxy(m)
 				xl.Info("close proxy [%s] success", m.ProxyName)
 			case *msg.Ping:
 				content := &plugin.PingContent{
@@ -498,6 +523,18 @@ func (ctl *Control) manager() {
 	}
 }
 
+func (ctl *Control) HandleNatHoleVisitor(m *msg.NatHoleVisitor) {
+	ctl.rc.NatHoleController.HandleVisitor(m, ctl.msgTransporter)
+}
+
+func (ctl *Control) HandleNatHoleClient(m *msg.NatHoleClient) {
+	ctl.rc.NatHoleController.HandleClient(m, ctl.msgTransporter)
+}
+
+func (ctl *Control) HandleNatHoleReport(m *msg.NatHoleReport) {
+	ctl.rc.NatHoleController.HandleReport(m)
+}
+
 func (ctl *Control) RegisterProxy(pxyMsg *msg.NewProxy) (remoteAddr string, err error) {
 	var pxyConf config.ProxyConf
 	// Load configures from NewProxy message and check.
@@ -515,7 +552,7 @@ func (ctl *Control) RegisterProxy(pxyMsg *msg.NewProxy) (remoteAddr string, err 
 
 	// NewProxy will return a interface Proxy.
 	// In fact it create different proxies by different proxy type, we just call run() here.
-	pxy, err := proxy.NewProxy(ctl.ctx, userInfo, ctl.rc, ctl.poolCount, ctl.GetWorkConn, pxyConf, ctl.serverCfg)
+	pxy, err := proxy.NewProxy(ctl.ctx, userInfo, ctl.rc, ctl.poolCount, ctl.GetWorkConn, pxyConf, ctl.serverCfg, ctl.loginMsg)
 	if err != nil {
 		return remoteAddr, err
 	}
@@ -528,13 +565,13 @@ func (ctl *Control) RegisterProxy(pxyMsg *msg.NewProxy) (remoteAddr string, err 
 			err = fmt.Errorf("exceed the max_ports_per_client")
 			return
 		}
-		ctl.portsUsedNum = ctl.portsUsedNum + pxy.GetUsedPortsNum()
+		ctl.portsUsedNum += pxy.GetUsedPortsNum()
 		ctl.mu.Unlock()
 
 		defer func() {
 			if err != nil {
 				ctl.mu.Lock()
-				ctl.portsUsedNum = ctl.portsUsedNum - pxy.GetUsedPortsNum()
+				ctl.portsUsedNum -= pxy.GetUsedPortsNum()
 				ctl.mu.Unlock()
 			}
 		}()
@@ -570,7 +607,7 @@ func (ctl *Control) CloseProxy(closeMsg *msg.CloseProxy) (err error) {
 	}
 
 	if ctl.serverCfg.MaxPortsPerClient > 0 {
-		ctl.portsUsedNum = ctl.portsUsedNum - pxy.GetUsedPortsNum()
+		ctl.portsUsedNum -= pxy.GetUsedPortsNum()
 	}
 	pxy.Close()
 	ctl.pxyManager.Del(pxy.GetName())
@@ -590,7 +627,7 @@ func (ctl *Control) CloseProxy(closeMsg *msg.CloseProxy) (err error) {
 		},
 	}
 	go func() {
-		ctl.pluginManager.CloseProxy(notifyContent)
+		_ = ctl.pluginManager.CloseProxy(notifyContent)
 	}()
 
 	return

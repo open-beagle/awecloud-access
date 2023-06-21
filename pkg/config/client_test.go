@@ -17,18 +17,17 @@ package config
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/fatedier/frp/pkg/auth"
 	"github.com/fatedier/frp/pkg/consts"
-
-	"github.com/stretchr/testify/assert"
 )
 
 const (
 	testUser = "test"
 )
 
-var (
-	testClientBytesWithFull = []byte(`
+var testClientBytesWithFull = []byte(`
 		# [common] is integral section
 		[common]
 		server_addr = 0.0.0.9
@@ -75,6 +74,7 @@ var (
 		local_ip = 127.0.0.9
 		local_port = 29
 		bandwidth_limit = 19MB
+		bandwidth_limit_mode = server
 		use_encryption
 		use_compression
 		remote_port = 6009
@@ -237,7 +237,6 @@ var (
 		use_encryption = false
 		use_compression = false
 	`)
-)
 
 func Test_LoadClientCommonConf(t *testing.T) {
 	assert := assert.New(t)
@@ -261,6 +260,7 @@ func Test_LoadClientCommonConf(t *testing.T) {
 		},
 		ServerAddr:              "0.0.0.9",
 		ServerPort:              7009,
+		NatHoleSTUNServer:       "stun.easyvoip.com:3478",
 		DialServerTimeout:       10,
 		DialServerKeepAlive:     7200,
 		HTTPProxy:               "http://user:passwd@192.168.1.128:8080",
@@ -280,6 +280,9 @@ func Test_LoadClientCommonConf(t *testing.T) {
 		User:                    "your_name",
 		LoginFailExit:           true,
 		Protocol:                "tcp",
+		QUICKeepalivePeriod:     10,
+		QUICMaxIdleTimeout:      30,
+		QUICMaxIncomingStreams:  100000,
 		TLSEnable:               true,
 		TLSCertFile:             "client.crt",
 		TLSKeyFile:              "client.key",
@@ -308,13 +311,14 @@ func Test_LoadClientBasicConf(t *testing.T) {
 	proxyExpected := map[string]ProxyConf{
 		testUser + ".ssh": &TCPProxyConf{
 			BaseProxyConf: BaseProxyConf{
-				ProxyName:      testUser + ".ssh",
-				ProxyType:      consts.TCPProxy,
-				UseCompression: true,
-				UseEncryption:  true,
-				Group:          "test_group",
-				GroupKey:       "123456",
-				BandwidthLimit: MustBandwidthQuantity("19MB"),
+				ProxyName:          testUser + ".ssh",
+				ProxyType:          consts.TCPProxy,
+				UseCompression:     true,
+				UseEncryption:      true,
+				Group:              "test_group",
+				GroupKey:           "123456",
+				BandwidthLimit:     MustBandwidthQuantity("19MB"),
+				BandwidthLimitMode: BandwidthLimitModeServer,
 				Metas: map[string]string{
 					"var1": "123",
 					"var2": "234",
@@ -341,6 +345,7 @@ func Test_LoadClientBasicConf(t *testing.T) {
 					LocalIP:   "127.0.0.9",
 					LocalPort: 29,
 				},
+				BandwidthLimitMode: BandwidthLimitModeClient,
 			},
 			RemotePort: 9,
 		},
@@ -352,6 +357,7 @@ func Test_LoadClientBasicConf(t *testing.T) {
 					LocalIP:   "127.0.0.9",
 					LocalPort: 6010,
 				},
+				BandwidthLimitMode: BandwidthLimitModeClient,
 			},
 			RemotePort: 6010,
 		},
@@ -363,6 +369,7 @@ func Test_LoadClientBasicConf(t *testing.T) {
 					LocalIP:   "127.0.0.9",
 					LocalPort: 6011,
 				},
+				BandwidthLimitMode: BandwidthLimitModeClient,
 			},
 			RemotePort: 6011,
 		},
@@ -374,6 +381,7 @@ func Test_LoadClientBasicConf(t *testing.T) {
 					LocalIP:   "127.0.0.9",
 					LocalPort: 6019,
 				},
+				BandwidthLimitMode: BandwidthLimitModeClient,
 			},
 			RemotePort: 6019,
 		},
@@ -387,6 +395,7 @@ func Test_LoadClientBasicConf(t *testing.T) {
 					LocalIP:   "114.114.114.114",
 					LocalPort: 59,
 				},
+				BandwidthLimitMode: BandwidthLimitModeClient,
 			},
 			RemotePort: 6009,
 		},
@@ -400,6 +409,7 @@ func Test_LoadClientBasicConf(t *testing.T) {
 					LocalIP:   "114.114.114.114",
 					LocalPort: 6000,
 				},
+				BandwidthLimitMode: BandwidthLimitModeClient,
 			},
 			RemotePort: 6000,
 		},
@@ -413,6 +423,7 @@ func Test_LoadClientBasicConf(t *testing.T) {
 					LocalIP:   "114.114.114.114",
 					LocalPort: 6010,
 				},
+				BandwidthLimitMode: BandwidthLimitModeClient,
 			},
 			RemotePort: 6010,
 		},
@@ -426,6 +437,7 @@ func Test_LoadClientBasicConf(t *testing.T) {
 					LocalIP:   "114.114.114.114",
 					LocalPort: 6011,
 				},
+				BandwidthLimitMode: BandwidthLimitModeClient,
 			},
 			RemotePort: 6011,
 		},
@@ -446,6 +458,7 @@ func Test_LoadClientBasicConf(t *testing.T) {
 					HealthCheckIntervalS: 19,
 					HealthCheckURL:       "http://127.0.0.9:89/status",
 				},
+				BandwidthLimitMode: BandwidthLimitModeClient,
 			},
 			DomainConf: DomainConf{
 				CustomDomains: []string{"web02.yourdomain.com"},
@@ -470,6 +483,7 @@ func Test_LoadClientBasicConf(t *testing.T) {
 					LocalPort: 8009,
 				},
 				ProxyProtocolVersion: "v2",
+				BandwidthLimitMode:   BandwidthLimitModeClient,
 			},
 			DomainConf: DomainConf{
 				CustomDomains: []string{"web02.yourdomain.com"},
@@ -484,6 +498,7 @@ func Test_LoadClientBasicConf(t *testing.T) {
 					LocalIP:   "127.0.0.1",
 					LocalPort: 22,
 				},
+				BandwidthLimitMode: BandwidthLimitModeClient,
 			},
 			Role: "server",
 			Sk:   "abcdefg",
@@ -496,6 +511,7 @@ func Test_LoadClientBasicConf(t *testing.T) {
 					LocalIP:   "127.0.0.1",
 					LocalPort: 22,
 				},
+				BandwidthLimitMode: BandwidthLimitModeClient,
 			},
 			Role: "server",
 			Sk:   "abcdefg",
@@ -508,6 +524,7 @@ func Test_LoadClientBasicConf(t *testing.T) {
 					LocalIP:   "127.0.0.1",
 					LocalPort: 10701,
 				},
+				BandwidthLimitMode: BandwidthLimitModeClient,
 			},
 			DomainConf: DomainConf{
 				CustomDomains: []string{"tunnel1"},
@@ -526,6 +543,7 @@ func Test_LoadClientBasicConf(t *testing.T) {
 						"plugin_unix_path": "/var/run/docker.sock",
 					},
 				},
+				BandwidthLimitMode: BandwidthLimitModeClient,
 			},
 			RemotePort: 6003,
 		},
@@ -541,6 +559,7 @@ func Test_LoadClientBasicConf(t *testing.T) {
 						"plugin_http_passwd": "abc",
 					},
 				},
+				BandwidthLimitMode: BandwidthLimitModeClient,
 			},
 			RemotePort: 6004,
 		},
@@ -556,6 +575,7 @@ func Test_LoadClientBasicConf(t *testing.T) {
 						"plugin_passwd": "abc",
 					},
 				},
+				BandwidthLimitMode: BandwidthLimitModeClient,
 			},
 			RemotePort: 6005,
 		},
@@ -573,6 +593,7 @@ func Test_LoadClientBasicConf(t *testing.T) {
 						"plugin_http_passwd":  "abc",
 					},
 				},
+				BandwidthLimitMode: BandwidthLimitModeClient,
 			},
 			RemotePort: 6006,
 		},
@@ -591,6 +612,7 @@ func Test_LoadClientBasicConf(t *testing.T) {
 						"plugin_header_X-From-Where": "frp",
 					},
 				},
+				BandwidthLimitMode: BandwidthLimitModeClient,
 			},
 			DomainConf: DomainConf{
 				CustomDomains: []string{"test.yourdomain.com"},
@@ -609,6 +631,7 @@ func Test_LoadClientBasicConf(t *testing.T) {
 						"plugin_header_X-From-Where": "frp",
 					},
 				},
+				BandwidthLimitMode: BandwidthLimitModeClient,
 			},
 			DomainConf: DomainConf{
 				CustomDomains: []string{"test.yourdomain.com"},
@@ -638,6 +661,9 @@ func Test_LoadClientBasicConf(t *testing.T) {
 				BindAddr:   "127.0.0.1",
 				BindPort:   9001,
 			},
+			Protocol:         "quic",
+			MaxRetriesAnHour: 8,
+			MinRetryInterval: 90,
 		},
 	}
 

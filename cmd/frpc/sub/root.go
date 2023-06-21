@@ -28,15 +28,13 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/spf13/cobra"
+
 	"github.com/fatedier/frp/client"
 	"github.com/fatedier/frp/pkg/auth"
 	"github.com/fatedier/frp/pkg/config"
 	"github.com/fatedier/frp/pkg/util/log"
 	"github.com/fatedier/frp/pkg/util/version"
-
-	"github.com/spf13/cobra"
-
-	unet "github.com/fatedier/frp/pkg/util/net"
 )
 
 const (
@@ -57,25 +55,28 @@ var (
 	logFile         string
 	logMaxDays      int
 	disableLogColor bool
+	dnsServer       string
 
-	proxyName         string
-	localIP           string
-	localPort         int
-	remotePort        int
-	useEncryption     bool
-	useCompression    bool
-	customDomains     string
-	subDomain         string
-	httpUser          string
-	httpPwd           string
-	locations         string
-	hostHeaderRewrite string
-	role              string
-	sk                string
-	multiplexer       string
-	serverName        string
-	bindAddr          string
-	bindPort          int
+	proxyName          string
+	localIP            string
+	localPort          int
+	remotePort         int
+	useEncryption      bool
+	useCompression     bool
+	bandwidthLimit     string
+	bandwidthLimitMode string
+	customDomains      string
+	subDomain          string
+	httpUser           string
+	httpPwd            string
+	locations          string
+	hostHeaderRewrite  string
+	role               string
+	sk                 string
+	multiplexer        string
+	serverName         string
+	bindAddr           string
+	bindPort           int
 
 	tlsEnable bool
 )
@@ -96,6 +97,7 @@ func RegisterCommonFlags(cmd *cobra.Command) {
 	cmd.PersistentFlags().IntVarP(&logMaxDays, "log_max_days", "", 3, "log file reversed days")
 	cmd.PersistentFlags().BoolVarP(&disableLogColor, "disable_log_color", "", false, "disable log color in console")
 	cmd.PersistentFlags().BoolVarP(&tlsEnable, "tls_enable", "", false, "enable frpc tls")
+	cmd.PersistentFlags().StringVarP(&dnsServer, "dns_server", "", "", "specify dns server instead of using system default one")
 }
 
 var rootCmd = &cobra.Command{
@@ -110,26 +112,7 @@ var rootCmd = &cobra.Command{
 		// If cfgDir is not empty, run multiple frpc service for each config file in cfgDir.
 		// Note that it's only designed for testing. It's not guaranteed to be stable.
 		if cfgDir != "" {
-			var wg sync.WaitGroup
-			filepath.WalkDir(cfgDir, func(path string, d fs.DirEntry, err error) error {
-				if err != nil {
-					return nil
-				}
-				if d.IsDir() {
-					return nil
-				}
-				wg.Add(1)
-				time.Sleep(time.Millisecond)
-				go func() {
-					defer wg.Done()
-					err := runClient(path)
-					if err != nil {
-						fmt.Printf("frpc service error for config file [%s]\n", path)
-					}
-				}()
-				return nil
-			})
-			wg.Wait()
+			_ = runMultipleClients(cfgDir)
 			return nil
 		}
 
@@ -141,6 +124,27 @@ var rootCmd = &cobra.Command{
 		}
 		return nil
 	},
+}
+
+func runMultipleClients(cfgDir string) error {
+	var wg sync.WaitGroup
+	err := filepath.WalkDir(cfgDir, func(path string, d fs.DirEntry, err error) error {
+		if err != nil || d.IsDir() {
+			return nil
+		}
+		wg.Add(1)
+		time.Sleep(time.Millisecond)
+		go func() {
+			defer wg.Done()
+			err := runClient(path)
+			if err != nil {
+				fmt.Printf("frpc service error for config file [%s]\n", path)
+			}
+		}()
+		return nil
+	})
+	wg.Wait()
+	return err
 }
 
 func Execute() {
@@ -179,6 +183,7 @@ func parseClientCommonCfgFromCmd() (cfg config.ClientCommonConf, err error) {
 	cfg.LogFile = logFile
 	cfg.LogMaxDays = int64(logMaxDays)
 	cfg.DisableLogColor = disableLogColor
+	cfg.DNSServer = dnsServer
 
 	// Only token authentication is supported in cmd mode
 	cfg.ClientConfig = auth.GetDefaultClientConf()
@@ -187,7 +192,7 @@ func parseClientCommonCfgFromCmd() (cfg config.ClientCommonConf, err error) {
 
 	cfg.Complete()
 	if err = cfg.Validate(); err != nil {
-		err = fmt.Errorf("Parse config error: %v", err)
+		err = fmt.Errorf("parse config error: %v", err)
 		return
 	}
 	return
@@ -244,7 +249,6 @@ func startService(
 	visitorCfgs map[string]config.VisitorConf,
 	cfgFile string,
 ) (err error) {
-
 	log.InitLog(cfg.LogWay, cfg.LogFile, cfg.LogLevel,
 		cfg.LogMaxDays, cfg.DisableLogColor)
 
@@ -258,15 +262,16 @@ func startService(
 		return
 	}
 
-	kcpDoneCh := make(chan struct{})
-	// Capture the exit signal if we use kcp.
-	if cfg.Protocol == "kcp" {
-		go handleSignal(svr, kcpDoneCh)
+	closedDoneCh := make(chan struct{})
+	shouldGracefulClose := cfg.Protocol == "kcp" || cfg.Protocol == "quic"
+	// Capture the exit signal if we use kcp or quic.
+	if shouldGracefulClose {
+		go handleSignal(svr, closedDoneCh)
 	}
 
 	err = svr.Run()
-	if err == nil && cfg.Protocol == "kcp" {
-		<-kcpDoneCh
+	if err == nil && shouldGracefulClose {
+		<-closedDoneCh
 	}
 	return
 }
