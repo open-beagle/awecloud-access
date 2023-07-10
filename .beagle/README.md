@@ -7,7 +7,7 @@ git remote add upstream git@github.com:fatedier/frp.git
 
 git fetch upstream
 
-git merge v0.49.0
+git merge v0.51.0
 ```
 
 ## debug
@@ -21,11 +21,11 @@ docker run \
 -w /go/src/github.com/fatedier/frp \
 -e PLUGIN_MAIN=cmd/frps \
 -e PLUGIN_BINARY=awecloud-access-server \
--e PLUGIN_VERSION=v6.1.0 \
+-e PLUGIN_VERSION=v6.2.0 \
 registry.cn-qingdao.aliyuncs.com/wod/devops-go-arch:1.20-alpine
 
 # start server
-$PWD/dist/awecloud-access-server-v6.1.0-linux-amd64 -c $PWD/.vscode/frps.ini
+$PWD/dist/awecloud-access-server-v6.2.0-linux-amd64 -c $PWD/.vscode/frps.ini
 
 # client
 docker run \
@@ -35,15 +35,15 @@ docker run \
 -w /go/src/github.com/fatedier/frp \
 -e PLUGIN_MAIN=cmd/frpc \
 -e PLUGIN_BINARY=awecloud-access-client \
--e PLUGIN_VERSION=v6.1.0 \
+-e PLUGIN_VERSION=v6.2.0 \
 registry.cn-qingdao.aliyuncs.com/wod/devops-go-arch:1.20-alpine
 
 # start client
-$PWD/dist/awecloud-access-client-v6.1.0-linux-amd64 -c $PWD/.vscode/frpc.ini
+$PWD/dist/awecloud-access-client-v6.2.0-linux-amd64 -c $PWD/.vscode/frpc.ini
 
 # windows
 CGO_ENABLED=0 GOOS=windows GOARCH=amd64 \
-go build -o $PWD/dist/awecloud-access-client-v6.1.0.exe \
+go build -o $PWD/dist/awecloud-access-client-v6.2.0.exe \
 cmd/frpc/main.go
 ```
 
@@ -90,8 +90,8 @@ docker run --rm \
 ```bash
 # install bin
 mkdir -p /opt/bin
-ln -s /etc/kubernetes/services/k8s-client/awecloud-access-client-v6.1.0-linux-amd64 /opt/bin/awecloud-access-client
-chmod +x /etc/kubernetes/services/k8s-client/awecloud-access-client-v6.1.0-linux-amd64
+ln -s /etc/kubernetes/services/k8s-client/awecloud-access-client-v6.2.0-linux-amd64 /opt/bin/awecloud-access-client
+chmod +x /etc/kubernetes/services/k8s-client/awecloud-access-client-v6.2.0-linux-amd64
 
 # install service
 systemctl enable k8s-client
@@ -140,4 +140,17 @@ ExecStart=/opt/bin/awecloud-access-client \
 
 [Install]
 WantedBy=multi-user.target
+```
+
+## tags
+
+```bash
+# 新建一个Tag
+git tag v0.6.2-beagle.0
+
+# 推送一个Tag ，-f 强制更新
+git push -f origin v0.6.2-beagle.0
+
+# 删除本地Tag
+git tag -d v0.6.2-beagle.0
 ```
