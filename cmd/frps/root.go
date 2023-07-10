@@ -15,6 +15,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"os"
 
@@ -216,6 +217,6 @@ func runServer(cfg config.ServerCommonConf) (err error) {
 		return err
 	}
 	log.Info("frps started successfully")
-	svr.Run()
+	svr.Run(context.Background())
 	return
 }

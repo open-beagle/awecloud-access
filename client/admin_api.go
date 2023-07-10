@@ -24,6 +24,7 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/samber/lo"
 
@@ -42,7 +43,7 @@ func (svr *Service) healthz(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(200)
 }
 
-// GET api/reload
+// GET /api/reload
 func (svr *Service) apiReload(w http.ResponseWriter, r *http.Request) {
 	res := GeneralResponse{Code: 200}
 
@@ -72,6 +73,22 @@ func (svr *Service) apiReload(w http.ResponseWriter, r *http.Request) {
 	log.Info("success reload conf")
 }
 
+// POST /api/stop
+func (svr *Service) apiStop(w http.ResponseWriter, r *http.Request) {
+	res := GeneralResponse{Code: 200}
+
+	log.Info("api request [/api/stop]")
+	defer func() {
+		log.Info("api response [/api/stop], code [%d]", res.Code)
+		w.WriteHeader(res.Code)
+		if len(res.Msg) > 0 {
+			_, _ = w.Write([]byte(res.Msg))
+		}
+	}()
+
+	go svr.GracefulClose(100 * time.Millisecond)
+}
+
 type StatusResp map[string][]ProxyStatusResp
 
 type ProxyStatusResp struct {
@@ -91,7 +108,7 @@ func NewProxyStatusResp(status *proxy.WorkingStatus, serverAddr string) ProxySta
 		Status: status.Phase,
 		Err:    status.Err,
 	}
-	baseCfg := status.Cfg.GetBaseInfo()
+	baseCfg := status.Cfg.GetBaseConfig()
 	if baseCfg.LocalPort != 0 {
 		psr.LocalAddr = net.JoinHostPort(baseCfg.LocalIP, strconv.Itoa(baseCfg.LocalPort))
 	}
@@ -106,7 +123,7 @@ func NewProxyStatusResp(status *proxy.WorkingStatus, serverAddr string) ProxySta
 	return psr
 }
 
-// GET api/status
+// GET /api/status
 func (svr *Service) apiStatus(w http.ResponseWriter, r *http.Request) {
 	var (
 		buf []byte
@@ -135,7 +152,7 @@ func (svr *Service) apiStatus(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// GET api/config
+// GET /api/config
 func (svr *Service) apiGetConfig(w http.ResponseWriter, r *http.Request) {
 	res := GeneralResponse{Code: 200}
 
@@ -175,7 +192,7 @@ func (svr *Service) apiGetConfig(w http.ResponseWriter, r *http.Request) {
 	res.Msg = strings.Join(newRows, "\n")
 }
 
-// PUT api/config
+// PUT /api/config
 func (svr *Service) apiPutConfig(w http.ResponseWriter, r *http.Request) {
 	res := GeneralResponse{Code: 200}
 
