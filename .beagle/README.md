@@ -100,7 +100,7 @@ systemctl start k8s-client
 
 /etc/kubernetes/services/k8s-client/config.ini
 
-```bash
+```ini
 [common]
 user = <USER>
 
@@ -126,7 +126,7 @@ local_ip=127.0.0.1
 
 /etc/systemd/system/k8s-client.service
 
-```service
+```ini
 [Unit]
 Description=k8s-client
 Wants=network.target
