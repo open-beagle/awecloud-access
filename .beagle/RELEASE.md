@@ -1,10 +1,10 @@
 # release
 
-awecloud-access更新的版本说明
+awecloud-access 更新的版本说明
 
 ## v6.2.0 - v0.6.2-beagle.0
 
-将frp升级至v0.51.0
+将 frp 升级至 v0.51.0
 
 ```bash
 git merge v0.51.0
@@ -12,15 +12,15 @@ git merge v0.51.0
 
 ## v6.1.0 - v0.6.1-beagle.0
 
-将frp升级至v0.49.0
+将 frp 升级至 v0.49.0
 
 ```bash
 git merge v0.49.0
 ```
 
-### 对Client进行身份验证
+### 对 Client 进行身份验证
 
-frps服务器配置，对身份验证的超时与检核方式进行控制
+frps 服务器配置，对身份验证的超时与检核方式进行控制
 
 ```ini
 [common]
@@ -33,9 +33,9 @@ authenticate_new_work_conns = false
 
 1. Token 身份验证 【默认配置】
 
-使用静态Token进行身份验证
+使用静态 Token 进行身份验证
 
-frps服务器配置
+frps 服务器配置
 
 ```ini
 [common]
@@ -43,7 +43,7 @@ authentication_method = token
 token = changeit
 ```
 
-frpc客户端配置
+frpc 客户端配置
 
 ```ini
 [common]
@@ -53,9 +53,9 @@ token = changeit
 
 2. OIDC 身份验证
 
-使用OpenID Connect技术进行身份验证
+使用 OpenID Connect 技术进行身份验证
 
-frps服务器配置
+frps 服务器配置
 
 ```ini
 # frps.ini
@@ -65,7 +65,7 @@ oidc_issuer = https://example-oidc-issuer.com/
 oidc_audience = https://oidc-audience.com/.default
 ```
 
-frpc客户端配置
+frpc 客户端配置
 
 ```ini
 # frpc.ini
@@ -93,7 +93,7 @@ use_compression = true
 
 ## v6.0.1 - v0.6.0-beagle.1
 
-将frp升级至v0.44.0
+将 frp 升级至 v0.44.0
 
 ```bash
 git merge v0.44.0
