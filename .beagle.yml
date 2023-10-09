@@ -51,9 +51,9 @@ steps:
       base: registry.cn-qingdao.aliyuncs.com/wod/alpine:3-amd64
       dockerfile: build/client.dockerfile
       repo: wod/awecloud-access-client
-      version: 'v6.2.1'
+      version: "v6.2.1"
       channel: amd64
-      args: 'TARGETOS=linux,TARGETARCH=amd64'
+      args: "TARGETOS=linux,TARGETARCH=amd64"
       registry: registry.cn-qingdao.aliyuncs.com
       registry_user:
         from_secret: REGISTRY_USER_ALIYUN
@@ -69,9 +69,9 @@ steps:
       base: registry.cn-qingdao.aliyuncs.com/wod/alpine:3-arm64
       dockerfile: build/client.dockerfile
       repo: wod/awecloud-access-client
-      version: 'v6.2.1'
+      version: "v6.2.1"
       channel: arm64
-      args: 'TARGETOS=linux,TARGETARCH=arm64'
+      args: "TARGETOS=linux,TARGETARCH=arm64"
       registry: registry.cn-qingdao.aliyuncs.com
       registry_user:
         from_secret: REGISTRY_USER_ALIYUN
@@ -87,9 +87,9 @@ steps:
       base: registry.cn-qingdao.aliyuncs.com/wod/alpine:3-ppc64le
       dockerfile: build/client.dockerfile
       repo: wod/awecloud-access-client
-      version: 'v6.2.1'
+      version: "v6.2.1"
       channel: ppc64le
-      args: 'TARGETOS=linux,TARGETARCH=ppc64le'
+      args: "TARGETOS=linux,TARGETARCH=ppc64le"
       registry: registry.cn-qingdao.aliyuncs.com
       registry_user:
         from_secret: REGISTRY_USER_ALIYUN
@@ -105,9 +105,9 @@ steps:
       base: registry.cn-qingdao.aliyuncs.com/wod/alpine:3-mips64le
       dockerfile: build/client.dockerfile
       repo: wod/awecloud-access-client
-      version: 'v6.2.1'
+      version: "v6.2.1"
       channel: mips64le
-      args: 'TARGETOS=linux,TARGETARCH=mips64le'
+      args: "TARGETOS=linux,TARGETARCH=mips64le"
       registry: registry.cn-qingdao.aliyuncs.com
       registry_user:
         from_secret: REGISTRY_USER_ALIYUN
@@ -246,9 +246,9 @@ steps:
       base: registry.cn-qingdao.aliyuncs.com/wod/alpine:3-amd64
       dockerfile: build/server.dockerfile
       repo: wod/awecloud-access-server
-      version: 'v6.2.1'
+      version: "v6.2.1"
       channel: amd64
-      args: 'TARGETOS=linux,TARGETARCH=amd64'
+      args: "TARGETOS=linux,TARGETARCH=amd64"
       registry: registry.cn-qingdao.aliyuncs.com
       registry_user:
         from_secret: REGISTRY_USER_ALIYUN
@@ -264,9 +264,9 @@ steps:
       base: registry.cn-qingdao.aliyuncs.com/wod/alpine:3-arm64
       dockerfile: build/server.dockerfile
       repo: wod/awecloud-access-server
-      version: 'v6.2.1'
+      version: "v6.2.1"
       channel: arm64
-      args: 'TARGETOS=linux,TARGETARCH=arm64'
+      args: "TARGETOS=linux,TARGETARCH=arm64"
       registry: registry.cn-qingdao.aliyuncs.com
       registry_user:
         from_secret: REGISTRY_USER_ALIYUN
@@ -282,9 +282,9 @@ steps:
       base: registry.cn-qingdao.aliyuncs.com/wod/alpine:3-ppc64le
       dockerfile: build/server.dockerfile
       repo: wod/awecloud-access-server
-      version: 'v6.2.1'
+      version: "v6.2.1"
       channel: ppc64le
-      args: 'TARGETOS=linux,TARGETARCH=ppc64le'
+      args: "TARGETOS=linux,TARGETARCH=ppc64le"
       registry: registry.cn-qingdao.aliyuncs.com
       registry_user:
         from_secret: REGISTRY_USER_ALIYUN
@@ -300,9 +300,9 @@ steps:
       base: registry.cn-qingdao.aliyuncs.com/wod/alpine:3-mips64le
       dockerfile: build/server.dockerfile
       repo: wod/awecloud-access-server
-      version: 'v6.2.1'
+      version: "v6.2.1"
       channel: mips64le
-      args: 'TARGETOS=linux,TARGETARCH=mips64le'
+      args: "TARGETOS=linux,TARGETARCH=mips64le"
       registry: registry.cn-qingdao.aliyuncs.com
       registry_user:
         from_secret: REGISTRY_USER_ALIYUN
@@ -374,7 +374,7 @@ steps:
       registry_user:
         from_secret: REGISTRY_USER_ALIYUN
       registry_password:
-        from_secret: REGISTRY_PASSWORD_ALIYUN 
+        from_secret: REGISTRY_PASSWORD_ALIYUN
 
   - name: harbor-arch
     image: registry.cn-qingdao.aliyuncs.com/wod/devops-docker-manifest:1.0
