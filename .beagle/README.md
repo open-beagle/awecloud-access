@@ -154,3 +154,9 @@ git push -f origin v0.6.2-beagle.3
 # 删除本地Tag
 git tag -d v0.6.2-beagle.3
 ```
+
+## minio
+
+```bash
+mc cp --recursive dist/ cache/vscode/access/
+```
