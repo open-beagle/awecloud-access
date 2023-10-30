@@ -172,8 +172,8 @@ func startService(
 	log.InitLog(cfg.Log.To, cfg.Log.Level, cfg.Log.MaxDays, cfg.Log.DisablePrintColor)
 
 	if cfgFile != "" {
-		log.Info("start frpc service for config file [%s]", cfgFile)
-		defer log.Info("frpc service for config file [%s] stopped", cfgFile)
+		log.Info("start messageclient service for config file [%s]", cfgFile)
+		defer log.Info("messageclient service for config file [%s] stopped", cfgFile)
 	}
 	svr, err := client.NewService(cfg, pxyCfgs, visitorCfgs, cfgFile)
 	if err != nil {
