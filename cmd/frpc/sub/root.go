@@ -135,19 +135,14 @@ func runClient(cfgFilePath string) error {
 			}
 		}
 		if servURL.Scheme == "http" {
-			cfg.Protocol = "ws"
+			cfg.Transport.Protocol = "ws"
 		}
 		if servURL.Scheme == "https" {
-			cfg.Protocol = "wss"
+			cfg.Transport.Protocol = "wss"
 		}
 		if len(servURL.Path) > 0 {
-			cfg.ServerPath = servURL.Path
+			unet.FrpWebsocketPath = servURL.Path
 		}
-	}
-
-	servPath := cfg.ServerPath
-	if len(servPath) > 0 {
-		unet.FrpWebsocketPath = servPath
 	}
 
 	if err != nil {
