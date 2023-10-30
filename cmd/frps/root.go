@@ -25,6 +25,7 @@ import (
 	v1 "github.com/fatedier/frp/pkg/config/v1"
 	"github.com/fatedier/frp/pkg/config/v1/validation"
 	"github.com/fatedier/frp/pkg/util/log"
+	unet "github.com/fatedier/frp/pkg/util/net"
 	"github.com/fatedier/frp/pkg/util/version"
 	"github.com/fatedier/frp/server"
 )
@@ -70,6 +71,10 @@ var rootCmd = &cobra.Command{
 		} else {
 			serverCfg.Complete()
 			svrCfg = &serverCfg
+		}
+
+		if len(os.Getenv("BIND_SOCKET_PATH")) > 0 {
+			unet.FrpWebsocketPath = os.Getenv("BIND_SOCKET_PATH")
 		}
 
 		warning, err := validation.ValidateServerConfig(svrCfg)
