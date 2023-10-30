@@ -203,7 +203,7 @@ func NewService(cfg config.ServerCommonConf) (svr *Service, err error) {
 	ln = svr.muxer.DefaultListener()
 
 	svr.listener = ln
-	log.Info("frps tcp listen on %s", address)
+	log.Info("messageserver tcp listen on %s", address)
 
 	// Listen for accepting connections from client using kcp protocol.
 	if cfg.KCPBindPort > 0 {
@@ -213,7 +213,7 @@ func NewService(cfg config.ServerCommonConf) (svr *Service, err error) {
 			err = fmt.Errorf("listen on kcp udp address %s error: %v", address, err)
 			return
 		}
-		log.Info("frps kcp listen on udp %s", address)
+		log.Info("messageserver kcp listen on udp %s", address)
 	}
 
 	if cfg.QUICBindPort > 0 {
@@ -229,7 +229,7 @@ func NewService(cfg config.ServerCommonConf) (svr *Service, err error) {
 			err = fmt.Errorf("listen on quic udp address %s error: %v", address, err)
 			return
 		}
-		log.Info("frps quic listen on quic %s", address)
+		log.Info("messageserver quic listen on quic %s", address)
 	}
 
 	// Listen for accepting connections from client using websocket protocol.

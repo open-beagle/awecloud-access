@@ -47,7 +47,7 @@ var verifyCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
-		fmt.Printf("frps: the configuration file %s syntax is ok\n", cfgFile)
+		fmt.Printf("messageserver: the configuration file %s syntax is ok\n", cfgFile)
 		return nil
 	},
 }

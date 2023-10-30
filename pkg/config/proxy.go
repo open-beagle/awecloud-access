@@ -440,7 +440,7 @@ func (cfg *DomainConf) validateForServer(serverCfg ServerCommonConf) (err error)
 
 	if cfg.SubDomain != "" {
 		if serverCfg.SubDomainHost == "" {
-			return fmt.Errorf("subdomain is not supported because this feature is not enabled in remote frps")
+			return fmt.Errorf("subdomain is not supported because this feature is not enabled in remote messageserver")
 		}
 		if strings.Contains(cfg.SubDomain, ".") || strings.Contains(cfg.SubDomain, "*") {
 			return fmt.Errorf("'.' and '*' is not supported in subdomain")
