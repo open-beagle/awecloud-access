@@ -20,8 +20,8 @@ import (
 
 	"github.com/gorilla/mux"
 
-	"github.com/fatedier/frp/pkg/config"
-	"github.com/fatedier/frp/pkg/consts"
+	"github.com/fatedier/frp/pkg/config/types"
+	v1 "github.com/fatedier/frp/pkg/config/v1"
 	"github.com/fatedier/frp/pkg/metrics/mem"
 	"github.com/fatedier/frp/pkg/util/log"
 	"github.com/fatedier/frp/pkg/util/version"
@@ -34,24 +34,24 @@ type GeneralResponse struct {
 
 type serverInfoResp struct {
 	Version               string `json:"version"`
-	BindPort              int    `json:"bind_port"`
-	VhostHTTPPort         int    `json:"vhost_http_port"`
-	VhostHTTPSPort        int    `json:"vhost_https_port"`
-	TCPMuxHTTPConnectPort int    `json:"tcpmux_httpconnect_port"`
-	KCPBindPort           int    `json:"kcp_bind_port"`
-	QUICBindPort          int    `json:"quic_bind_port"`
-	SubdomainHost         string `json:"subdomain_host"`
-	MaxPoolCount          int64  `json:"max_pool_count"`
-	MaxPortsPerClient     int64  `json:"max_ports_per_client"`
-	HeartBeatTimeout      int64  `json:"heart_beat_timeout"`
-	AllowPortsStr         string `json:"allow_ports_str,omitempty"`
-	TLSOnly               bool   `json:"tls_only,omitempty"`
+	BindPort              int    `json:"bindPort"`
+	VhostHTTPPort         int    `json:"vhostHTTPPort"`
+	VhostHTTPSPort        int    `json:"vhostHTTPSPort"`
+	TCPMuxHTTPConnectPort int    `json:"tcpmuxHTTPConnectPort"`
+	KCPBindPort           int    `json:"kcpBindPort"`
+	QUICBindPort          int    `json:"quicBindPort"`
+	SubdomainHost         string `json:"subdomainHost"`
+	MaxPoolCount          int64  `json:"maxPoolCount"`
+	MaxPortsPerClient     int64  `json:"maxPortsPerClient"`
+	HeartBeatTimeout      int64  `json:"heartbeatTimeout"`
+	AllowPortsStr         string `json:"allowPortsStr,omitempty"`
+	TLSForce              bool   `json:"tlsForce,omitempty"`
 
-	TotalTrafficIn  int64            `json:"total_traffic_in"`
-	TotalTrafficOut int64            `json:"total_traffic_out"`
-	CurConns        int64            `json:"cur_conns"`
-	ClientCounts    int64            `json:"client_counts"`
-	ProxyTypeCounts map[string]int64 `json:"proxy_type_count"`
+	TotalTrafficIn  int64            `json:"totalTrafficIn"`
+	TotalTrafficOut int64            `json:"totalTrafficOut"`
+	CurConns        int64            `json:"curConns"`
+	ClientCounts    int64            `json:"clientCounts"`
+	ProxyTypeCounts map[string]int64 `json:"proxyTypeCount"`
 }
 
 // /healthz
@@ -81,11 +81,11 @@ func (svr *Service) APIServerInfo(w http.ResponseWriter, r *http.Request) {
 		KCPBindPort:           svr.cfg.KCPBindPort,
 		QUICBindPort:          svr.cfg.QUICBindPort,
 		SubdomainHost:         svr.cfg.SubDomainHost,
-		MaxPoolCount:          svr.cfg.MaxPoolCount,
+		MaxPoolCount:          svr.cfg.Transport.MaxPoolCount,
 		MaxPortsPerClient:     svr.cfg.MaxPortsPerClient,
-		HeartBeatTimeout:      svr.cfg.HeartbeatTimeout,
-		AllowPortsStr:         svr.cfg.AllowPortsStr,
-		TLSOnly:               svr.cfg.TLSOnly,
+		HeartBeatTimeout:      svr.cfg.Transport.HeartbeatTimeout,
+		AllowPortsStr:         types.PortsRangeSlice(svr.cfg.AllowPorts).String(),
+		TLSForce:              svr.cfg.Transport.TLS.Force,
 
 		TotalTrafficIn:  serverStats.TotalTrafficIn,
 		TotalTrafficOut: serverStats.TotalTrafficOut,
@@ -99,35 +99,35 @@ func (svr *Service) APIServerInfo(w http.ResponseWriter, r *http.Request) {
 }
 
 type BaseOutConf struct {
-	config.BaseProxyConf
+	v1.ProxyBaseConfig
 }
 
 type TCPOutConf struct {
 	BaseOutConf
-	RemotePort int `json:"remote_port"`
+	RemotePort int `json:"remotePort"`
 }
 
 type TCPMuxOutConf struct {
 	BaseOutConf
-	config.DomainConf
+	v1.DomainConfig
 	Multiplexer string `json:"multiplexer"`
 }
 
 type UDPOutConf struct {
 	BaseOutConf
-	RemotePort int `json:"remote_port"`
+	RemotePort int `json:"remotePort"`
 }
 
 type HTTPOutConf struct {
 	BaseOutConf
-	config.DomainConf
+	v1.DomainConfig
 	Locations         []string `json:"locations"`
-	HostHeaderRewrite string   `json:"host_header_rewrite"`
+	HostHeaderRewrite string   `json:"hostHeaderRewrite"`
 }
 
 type HTTPSOutConf struct {
 	BaseOutConf
-	config.DomainConf
+	v1.DomainConfig
 }
 
 type STCPOutConf struct {
@@ -138,21 +138,21 @@ type XTCPOutConf struct {
 	BaseOutConf
 }
 
-func getConfByType(proxyType string) interface{} {
-	switch proxyType {
-	case consts.TCPProxy:
+func getConfByType(proxyType string) any {
+	switch v1.ProxyType(proxyType) {
+	case v1.ProxyTypeTCP:
 		return &TCPOutConf{}
-	case consts.TCPMuxProxy:
+	case v1.ProxyTypeTCPMUX:
 		return &TCPMuxOutConf{}
-	case consts.UDPProxy:
+	case v1.ProxyTypeUDP:
 		return &UDPOutConf{}
-	case consts.HTTPProxy:
+	case v1.ProxyTypeHTTP:
 		return &HTTPOutConf{}
-	case consts.HTTPSProxy:
+	case v1.ProxyTypeHTTPS:
 		return &HTTPSOutConf{}
-	case consts.STCPProxy:
+	case v1.ProxyTypeSTCP:
 		return &STCPOutConf{}
-	case consts.XTCPProxy:
+	case v1.ProxyTypeXTCP:
 		return &XTCPOutConf{}
 	default:
 		return nil
@@ -163,12 +163,12 @@ func getConfByType(proxyType string) interface{} {
 type ProxyStatsInfo struct {
 	Name            string      `json:"name"`
 	Conf            interface{} `json:"conf"`
-	ClientVersion   string      `json:"client_version,omitempty"`
-	TodayTrafficIn  int64       `json:"today_traffic_in"`
-	TodayTrafficOut int64       `json:"today_traffic_out"`
-	CurConns        int64       `json:"cur_conns"`
-	LastStartTime   string      `json:"last_start_time"`
-	LastCloseTime   string      `json:"last_close_time"`
+	ClientVersion   string      `json:"clientVersion,omitempty"`
+	TodayTrafficIn  int64       `json:"todayTrafficIn"`
+	TodayTrafficOut int64       `json:"todayTrafficOut"`
+	CurConns        int64       `json:"curConns"`
+	LastStartTime   string      `json:"lastStartTime"`
+	LastCloseTime   string      `json:"lastCloseTime"`
 	Status          string      `json:"status"`
 }
 
@@ -204,7 +204,7 @@ func (svr *Service) getProxyStatsByType(proxyType string) (proxyInfos []*ProxySt
 	for _, ps := range proxyStats {
 		proxyInfo := &ProxyStatsInfo{}
 		if pxy, ok := svr.pxyManager.GetByName(ps.Name); ok {
-			content, err := json.Marshal(pxy.GetConf())
+			content, err := json.Marshal(pxy.GetConfigurer())
 			if err != nil {
 				log.Warn("marshal proxy [%s] conf info error: %v", ps.Name, err)
 				continue
@@ -214,12 +214,12 @@ func (svr *Service) getProxyStatsByType(proxyType string) (proxyInfos []*ProxySt
 				log.Warn("unmarshal proxy [%s] conf info error: %v", ps.Name, err)
 				continue
 			}
-			proxyInfo.Status = consts.Online
+			proxyInfo.Status = "online"
 			if pxy.GetLoginMsg() != nil {
 				proxyInfo.ClientVersion = pxy.GetLoginMsg().Version
 			}
 		} else {
-			proxyInfo.Status = consts.Offline
+			proxyInfo.Status = "offline"
 		}
 		proxyInfo.Name = ps.Name
 		proxyInfo.TodayTrafficIn = ps.TodayTrafficIn
@@ -236,11 +236,11 @@ func (svr *Service) getProxyStatsByType(proxyType string) (proxyInfos []*ProxySt
 type GetProxyStatsResp struct {
 	Name            string      `json:"name"`
 	Conf            interface{} `json:"conf"`
-	TodayTrafficIn  int64       `json:"today_traffic_in"`
-	TodayTrafficOut int64       `json:"today_traffic_out"`
-	CurConns        int64       `json:"cur_conns"`
-	LastStartTime   string      `json:"last_start_time"`
-	LastCloseTime   string      `json:"last_close_time"`
+	TodayTrafficIn  int64       `json:"todayTrafficIn"`
+	TodayTrafficOut int64       `json:"todayTrafficOut"`
+	CurConns        int64       `json:"curConns"`
+	LastStartTime   string      `json:"lastStartTime"`
+	LastCloseTime   string      `json:"lastCloseTime"`
 	Status          string      `json:"status"`
 }
 
@@ -278,7 +278,7 @@ func (svr *Service) getProxyStatsByTypeAndName(proxyType string, proxyName strin
 		msg = "no proxy info found"
 	} else {
 		if pxy, ok := svr.pxyManager.GetByName(proxyName); ok {
-			content, err := json.Marshal(pxy.GetConf())
+			content, err := json.Marshal(pxy.GetConfigurer())
 			if err != nil {
 				log.Warn("marshal proxy [%s] conf info error: %v", ps.Name, err)
 				code = 400
@@ -292,9 +292,9 @@ func (svr *Service) getProxyStatsByTypeAndName(proxyType string, proxyName strin
 				msg = "parse conf error"
 				return
 			}
-			proxyInfo.Status = consts.Online
+			proxyInfo.Status = "online"
 		} else {
-			proxyInfo.Status = consts.Offline
+			proxyInfo.Status = "offline"
 		}
 		proxyInfo.TodayTrafficIn = ps.TodayTrafficIn
 		proxyInfo.TodayTrafficOut = ps.TodayTrafficOut
@@ -310,8 +310,8 @@ func (svr *Service) getProxyStatsByTypeAndName(proxyType string, proxyName strin
 // /api/traffic/:name
 type GetProxyTrafficResp struct {
 	Name       string  `json:"name"`
-	TrafficIn  []int64 `json:"traffic_in"`
-	TrafficOut []int64 `json:"traffic_out"`
+	TrafficIn  []int64 `json:"trafficIn"`
+	TrafficOut []int64 `json:"trafficOut"`
 }
 
 func (svr *Service) APIProxyTraffic(w http.ResponseWriter, r *http.Request) {

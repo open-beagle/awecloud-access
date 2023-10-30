@@ -1,3 +1,3 @@
-### Features
+### Fixes
 
-* Support Go 1.21.
+* `admin_user` is not effective in the INI configuration.

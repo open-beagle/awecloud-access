@@ -66,7 +66,7 @@ func getNotFoundPageContent() []byte {
 	return buf
 }
 
-func notFoundResponse() *http.Response {
+func NotFoundResponse() *http.Response {
 	header := make(http.Header)
 	header.Set("server", "beagle-access/"+version.Full())
 	header.Set("Content-Type", "text/html")
