@@ -2,6 +2,14 @@
 
 awecloud-access 更新的版本说明
 
+## v6.2.5 - v0.6.2-beagle.5
+
+升级至v0.53.2
+
+```bash
+git merge v0.53.2
+```
+
 ## v6.2.4 - v0.6.2-beagle.4
 
 去掉 frp 日志中的frps与frpc字符串
