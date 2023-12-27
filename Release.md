@@ -1,3 +1,3 @@
 ### Fixes
 
-* `admin_user` is not effective in the INI configuration.
+* frpc has a certain chance to panic when login: close of closed channel.
