@@ -9,7 +9,7 @@ LABEL maintainer=$AUTHOR version=$VERSION
 ARG TARGETOS
 ARG TARGETARCH
 
-COPY ./dist/awecloud-access-client-$TARGETOS-$TARGETARCH /app/awecloud-access-client
+COPY ./release/awecloud-access-client-$TARGETOS-$TARGETARCH /app/awecloud-access-client
 COPY ./build/client.conf.ini /etc/awecloud/conf.ini
 
 ENTRYPOINT ["/app/awecloud-access-client","-c","/etc/awecloud/conf.ini"]
