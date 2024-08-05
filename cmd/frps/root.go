@@ -97,6 +97,7 @@ var rootCmd = &cobra.Command{
 }
 
 func Execute() {
+	rootCmd.SetGlobalNormalizationFunc(config.WordSepNormalizeFunc)
 	if err := rootCmd.Execute(); err != nil {
 		os.Exit(1)
 	}
