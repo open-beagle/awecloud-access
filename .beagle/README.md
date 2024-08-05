@@ -7,7 +7,7 @@ git remote add upstream git@github.com:fatedier/frp.git
 
 git fetch upstream
 
-git merge v0.53.2
+git merge v0.54.0
 ```
 
 ## debug
@@ -22,7 +22,7 @@ registry.cn-qingdao.aliyuncs.com/wod/golang:1.21-alpine \
 bash .beagle/server.build.sh
 
 # start server
-$PWD/dist/awecloud-access-server-v6.2.5-linux-amd64 -c $PWD/.vscode/frps.ini
+$PWD/dist/awecloud-access-server-v6.2.6-linux-amd64 -c $PWD/.vscode/frps.ini
 
 # client
 docker run \
@@ -33,11 +33,11 @@ registry.cn-qingdao.aliyuncs.com/wod/golang:1.21-alpine \
 bash .beagle/client.build.sh
 
 # start client
-$PWD/dist/awecloud-access-client-v6.2.5-linux-amd64 -c $PWD/.vscode/frpc.ini
+$PWD/dist/awecloud-access-client-v6.2.6-linux-amd64 -c $PWD/.vscode/frpc.ini
 
 # windows
 CGO_ENABLED=0 GOOS=windows GOARCH=amd64 \
-go build -o $PWD/dist/awecloud-access-client-v6.2.5.exe \
+go build -o $PWD/dist/awecloud-access-client-v6.2.6.exe \
 cmd/frpc/main.go
 ```
 
@@ -91,8 +91,8 @@ sudo curl -sfL https://cache.wodcloud.com/vscode/access/install.sh | bash -
 ```bash
 # install bin
 mkdir -p /opt/bin
-ln -s /etc/kubernetes/services/k8s-client/awecloud-access-client-v6.2.5-linux-amd64 /opt/bin/awecloud-access-client
-chmod +x /etc/kubernetes/services/k8s-client/awecloud-access-client-v6.2.5-linux-amd64
+ln -s /etc/kubernetes/services/k8s-client/awecloud-access-client-v6.2.6-linux-amd64 /opt/bin/awecloud-access-client
+chmod +x /etc/kubernetes/services/k8s-client/awecloud-access-client-v6.2.6-linux-amd64
 
 # install service
 systemctl enable k8s-client
@@ -160,5 +160,5 @@ git tag -d v0.6.2-beagle.5
 
 ```bash
 mc cp .beagle/install.sh cache/vscode/access/install.sh
-mc cp --recursive release/ cache/vscode/access/v6.2.5/
+mc cp --recursive release/ cache/vscode/access/v6.2.6/
 ```
