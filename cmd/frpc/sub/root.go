@@ -175,8 +175,8 @@ func startService(
 	log.InitLogger(cfg.Log.To, cfg.Log.Level, int(cfg.Log.MaxDays), cfg.Log.DisablePrintColor)
 
 	if cfgFile != "" {
-		log.Info("start messageclient service for config file [%s]", cfgFile)
-		defer log.Info("messageclient service for config file [%s] stopped", cfgFile)
+		log.Infof("start messageclient service for config file [%s]", cfgFile)
+		defer log.Infof("messageclient service for config file [%s] stopped", cfgFile)
 	}
 	svr, err := client.NewService(client.ServiceOptions{
 		Common:         cfg,

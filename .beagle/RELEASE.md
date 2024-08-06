@@ -2,6 +2,14 @@
 
 awecloud-access 更新的版本说明
 
+## v6.2.7 - v0.6.2-beagle.7
+
+升级至 v0.55.1
+
+```bash
+git merge v0.55.1
+```
+
 ## v6.2.6 - v0.6.2-beagle.6
 
 升级至 v0.54.0

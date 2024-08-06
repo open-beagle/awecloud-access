@@ -222,7 +222,7 @@ func NewService(cfg *v1.ServerConfig) (*Service, error) {
 	ln = svr.muxer.DefaultListener()
 
 	svr.listener = ln
-	log.Info("messageserver tcp listen on %s", address)
+	log.Infof("messageserver tcp listen on %s", address)
 
 	// Listen for accepting connections from client using kcp protocol.
 	if cfg.KCPBindPort > 0 {
@@ -231,7 +231,7 @@ func NewService(cfg *v1.ServerConfig) (*Service, error) {
 		if err != nil {
 			return nil, fmt.Errorf("listen on kcp udp address %s error: %v", address, err)
 		}
-		log.Info("messageserver kcp listen on udp %s", address)
+		log.Infof("messageserver kcp listen on udp %s", address)
 	}
 
 	if cfg.QUICBindPort > 0 {
@@ -246,7 +246,7 @@ func NewService(cfg *v1.ServerConfig) (*Service, error) {
 		if err != nil {
 			return nil, fmt.Errorf("listen on quic udp address %s error: %v", address, err)
 		}
-		log.Info("messageserver quic listen on %s", address)
+		log.Infof("messageserver quic listen on %s", address)
 	}
 
 	if cfg.SSHTunnelGateway.BindPort > 0 {
@@ -255,7 +255,7 @@ func NewService(cfg *v1.ServerConfig) (*Service, error) {
 			return nil, fmt.Errorf("create ssh gateway error: %v", err)
 		}
 		svr.sshTunnelGateway = sshGateway
-		log.Info("messageserver sshTunnelGateway listen on port %d", cfg.SSHTunnelGateway.BindPort)
+		log.Infof("messageserver sshTunnelGateway listen on port %d", cfg.SSHTunnelGateway.BindPort)
 	}
 
 	// Listen for accepting connections from client using websocket protocol.

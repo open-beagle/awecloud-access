@@ -107,16 +107,16 @@ func runServer(cfg *v1.ServerConfig) (err error) {
 	log.InitLogger(cfg.Log.To, cfg.Log.Level, int(cfg.Log.MaxDays), cfg.Log.DisablePrintColor)
 
 	if cfgFile != "" {
-		log.Info("messageserver uses config file: %s", cfgFile)
+		log.Infof("messageserver uses config file: %s", cfgFile)
 	} else {
-		log.Info("messageserver uses command line arguments for config")
+		log.Infof("messageserver uses command line arguments for config")
 	}
 
 	svr, err := server.NewService(cfg)
 	if err != nil {
 		return err
 	}
-	log.Info("messageserver started successfully")
+	log.Infof("messageserver started successfully")
 	svr.Run(context.Background())
 	return
 }

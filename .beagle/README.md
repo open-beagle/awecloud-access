@@ -7,7 +7,7 @@ git remote add upstream git@github.com:fatedier/frp.git
 
 git fetch upstream
 
-git merge v0.54.0
+git merge v0.55.1
 ```
 
 ## debug
@@ -18,26 +18,26 @@ docker run \
 --rm \
 -v $PWD/:/go/src/github.com/fatedier/frp \
 -w /go/src/github.com/fatedier/frp \
-registry.cn-qingdao.aliyuncs.com/wod/golang:1.21-alpine \
+registry.cn-qingdao.aliyuncs.com/wod/golang:1.22-alpine \
 bash .beagle/server.build.sh
 
 # start server
-$PWD/dist/awecloud-access-server-v6.2.6-linux-amd64 -c $PWD/.vscode/frps.ini
+$PWD/dist/awecloud-access-server-v6.2.7-linux-amd64 -c $PWD/.vscode/frps.ini
 
 # client
 docker run \
 --rm \
 -v $PWD/:/go/src/github.com/fatedier/frp \
 -w /go/src/github.com/fatedier/frp \
-registry.cn-qingdao.aliyuncs.com/wod/golang:1.21-alpine \
+registry.cn-qingdao.aliyuncs.com/wod/golang:1.22-alpine \
 bash .beagle/client.build.sh
 
 # start client
-$PWD/dist/awecloud-access-client-v6.2.6-linux-amd64 -c $PWD/.vscode/frpc.ini
+$PWD/dist/awecloud-access-client-v6.2.7-linux-amd64 -c $PWD/.vscode/frpc.ini
 
 # windows
 CGO_ENABLED=0 GOOS=windows GOARCH=amd64 \
-go build -o $PWD/dist/awecloud-access-client-v6.2.6.exe \
+go build -o $PWD/dist/awecloud-access-client-v6.2.7.exe \
 cmd/frpc/main.go
 ```
 
@@ -48,7 +48,7 @@ cmd/frpc/main.go
 docker run -it --rm \
 -v $PWD/:/go/src/github.com/fatedier/frp \
 -w /go/src/github.com/fatedier/frp \
-registry.cn-qingdao.aliyuncs.com/wod/golang:1.21-alpine \
+registry.cn-qingdao.aliyuncs.com/wod/golang:1.22-alpine \
 rm -rf vendor && go mod tidy && go mod vendor
 
 # 构建缓存-->推送缓存至服务器
@@ -91,8 +91,8 @@ sudo curl -sfL https://cache.wodcloud.com/vscode/access/install.sh | bash -
 ```bash
 # install bin
 mkdir -p /opt/bin
-ln -s /etc/kubernetes/services/k8s-client/awecloud-access-client-v6.2.6-linux-amd64 /opt/bin/awecloud-access-client
-chmod +x /etc/kubernetes/services/k8s-client/awecloud-access-client-v6.2.6-linux-amd64
+ln -s /etc/kubernetes/services/k8s-client/awecloud-access-client-v6.2.7-linux-amd64 /opt/bin/awecloud-access-client
+chmod +x /etc/kubernetes/services/k8s-client/awecloud-access-client-v6.2.7-linux-amd64
 
 # install service
 systemctl enable k8s-client
@@ -147,18 +147,18 @@ WantedBy=multi-user.target
 
 ```bash
 # 新建一个Tag
-git tag v0.6.2-beagle.5
+git tag v0.6.2-beagle.7
 
 # 推送一个Tag ，-f 强制更新
-git push -f origin v0.6.2-beagle.5
+git push -f origin v0.6.2-beagle.7
 
 # 删除本地Tag
-git tag -d v0.6.2-beagle.5
+git tag -d v0.6.2-beagle.7
 ```
 
 ## minio
 
 ```bash
 mc cp .beagle/install.sh cache/vscode/access/install.sh
-mc cp --recursive release/ cache/vscode/access/v6.2.6/
+mc cp --recursive release/ cache/vscode/access/v6.2.7/
 ```

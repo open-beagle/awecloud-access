@@ -84,17 +84,17 @@ func (sv *SUDPVisitor) dispatcher() {
 		select {
 		case firstPacket = <-sv.sendCh:
 			if firstPacket == nil {
-				xl.Info("messageclient sudp visitor proxy is closed")
+				xl.Infof("messageclient sudp visitor proxy is closed")
 				return
 			}
 		case <-sv.checkCloseCh:
-			xl.Info("messageclient sudp visitor proxy is closed")
+			xl.Infof("messageclient sudp visitor proxy is closed")
 			return
 		}
 
 		visitorConn, err = sv.getNewVisitorConn()
 		if err != nil {
-			xl.Warn("newVisitorConn to messageserver error: %v, try to reconnect", err)
+			xl.Warnf("newVisitorConn to messageserver error: %v, try to reconnect", err)
 			continue
 		}
 
@@ -141,12 +141,12 @@ func (sv *SUDPVisitor) worker(workConn net.Conn, firstPacket *msg.UDPPacket) {
 			_ = conn.SetReadDeadline(time.Time{})
 			switch m := rawMsg.(type) {
 			case *msg.Ping:
-				xl.Debug("messageclient visitor get ping message from messageclient")
+				xl.Debugf("messageclient visitor get ping message from messageclient")
 				continue
 			case *msg.UDPPacket:
 				if errRet := errors.PanicToError(func() {
 					sv.readCh <- m
-					xl.Trace("messageclient visitor get udp packet from workConn: %s", m.Content)
+					xl.Tracef("messageclient visitor get udp packet from workConn: %s", m.Content)
 				}); errRet != nil {
 					xl.Infof("reader goroutine for udp work connection closed")
 					return

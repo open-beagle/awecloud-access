@@ -10,12 +10,3 @@ go build -trimpath -ldflags "${LDFLAGS}" -o ./release/awecloud-access-server-lin
 
 export GOARCH=arm64
 go build -trimpath -ldflags "${LDFLAGS}" -o ./release/awecloud-access-server-linux-${GOARCH} ./cmd/frps
-
-export GOARCH=ppc64le
-go build -trimpath -ldflags "${LDFLAGS}" -o ./release/awecloud-access-server-linux-${GOARCH} ./cmd/frps
-
-export GOARCH=mips64le
-go build -trimpath -ldflags "${LDFLAGS}" -o ./release/awecloud-access-server-linux-${GOARCH} ./cmd/frps
-
-export GOARCH=loong64
-go build -trimpath -ldflags "${LDFLAGS}" -o ./release/awecloud-access-server-linux-${GOARCH} ./cmd/frps
