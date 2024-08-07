@@ -147,13 +147,13 @@ WantedBy=multi-user.target
 
 ```bash
 # 新建一个Tag
-git tag v0.6.2-beagle.7
+git tag v0.6.2-beagle.8
 
 # 推送一个Tag ，-f 强制更新
-git push -f origin v0.6.2-beagle.7
+git push -f origin v0.6.2-beagle.8
 
 # 删除本地Tag
-git tag -d v0.6.2-beagle.7
+git tag -d v0.6.2-beagle.8
 ```
 
 ## minio
