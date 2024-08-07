@@ -217,7 +217,7 @@ func (f *Framework) RenderTemplates(templates []string) (outs []string, ports ma
 	}
 
 	for _, t := range templates {
-		tmpl, err := template.New("").Parse(t)
+		tmpl, err := template.New("frp-e2e").Parse(t)
 		if err != nil {
 			return nil, nil, err
 		}
@@ -260,7 +260,7 @@ func (f *Framework) SetEnvs(envs []string) {
 
 func (f *Framework) WriteTempFile(name string, content string) string {
 	filePath := filepath.Join(f.TempDirectory, name)
-	err := os.WriteFile(filePath, []byte(content), 0o766)
+	err := os.WriteFile(filePath, []byte(content), 0o600)
 	ExpectNoError(err)
 	return filePath
 }

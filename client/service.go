@@ -19,6 +19,7 @@ import (
 	"errors"
 	"fmt"
 	"net"
+	"os"
 	"runtime"
 	"sync"
 	"time"
@@ -40,6 +41,12 @@ import (
 
 func init() {
 	crypto.DefaultSalt = "acs"
+	// Disable quic-go's receive buffer warning.
+	os.Setenv("QUIC_GO_DISABLE_RECEIVE_BUFFER_WARNING", "true")
+	// Disable quic-go's ECN support by default. It may cause issues on certain operating systems.
+	if os.Getenv("QUIC_GO_DISABLE_ECN") == "" {
+		os.Setenv("QUIC_GO_DISABLE_ECN", "true")
+	}
 }
 
 type cancelErr struct {
@@ -373,18 +380,31 @@ func (svr *Service) stop() {
 	}
 }
 
-// TODO(fatedier): Use StatusExporter to provide query interfaces instead of directly using methods from the Service.
-func (svr *Service) GetProxyStatus(name string) (*proxy.WorkingStatus, error) {
+func (svr *Service) getProxyStatus(name string) (*proxy.WorkingStatus, bool) {
 	svr.ctlMu.RLock()
 	ctl := svr.ctl
 	svr.ctlMu.RUnlock()
 
 	if ctl == nil {
-		return nil, fmt.Errorf("control is not running")
+		return nil, false
 	}
-	ws, ok := ctl.pm.GetProxyStatus(name)
-	if !ok {
-		return nil, fmt.Errorf("proxy [%s] is not found", name)
+	return ctl.pm.GetProxyStatus(name)
+}
+
+func (svr *Service) StatusExporter() StatusExporter {
+	return &statusExporterImpl{
+		getProxyStatusFunc: svr.getProxyStatus,
 	}
-	return ws, nil
+}
+
+type StatusExporter interface {
+	GetProxyStatus(name string) (*proxy.WorkingStatus, bool)
+}
+
+type statusExporterImpl struct {
+	getProxyStatusFunc func(name string) (*proxy.WorkingStatus, bool)
+}
+
+func (s *statusExporterImpl) GetProxyStatus(name string) (*proxy.WorkingStatus, bool) {
+	return s.getProxyStatusFunc(name)
 }

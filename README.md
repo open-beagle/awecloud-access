@@ -10,12 +10,23 @@
 <h3 align="center">Gold Sponsors</h3>
 <!--gold sponsors start-->
 <p align="center">
-  <a href="https://workos.com/?utm_campaign=github_repo&utm_medium=referral&utm_content=frp&utm_source=github" target="_blank">
-    <img width="350px" src="https://raw.githubusercontent.com/fatedier/frp/dev/doc/pic/sponsor_workos.png">
+  <a href="https://lokal.so/?utm_campaign=github_repo&utm_medium=referral&utm_content=frp&utm_source=github" target="_blank">
+    <img width="420px" src="https://raw.githubusercontent.com/fatedier/frp/dev/doc/pic/sponsor_lokal.png">
   </a>
-  <a>&nbsp</a>
+</p>
+<p align="center">
+  <a href="https://workos.com/?utm_campaign=github_repo&utm_medium=referral&utm_content=frp&utm_source=github" target="_blank">
+    <img width="420px" src="https://raw.githubusercontent.com/fatedier/frp/dev/doc/pic/sponsor_workos.png">
+  </a>
+</p>
+<p align="center">
   <a href="https://github.com/daytonaio/daytona" target="_blank">
-    <img width="360px" src="https://raw.githubusercontent.com/fatedier/frp/dev/doc/pic/sponsor_daytona.png">
+    <img width="420px" src="https://raw.githubusercontent.com/fatedier/frp/dev/doc/pic/sponsor_daytona.png">
+  </a>
+</p>
+<p align="center">
+  <a href="https://github.com/beclab/terminus" target="_blank">
+    <img width="420px" src="https://raw.githubusercontent.com/fatedier/frp/dev/doc/pic/sponsor_terminusos.jpeg">
   </a>
 </p>
 <!--gold sponsors end-->
@@ -78,9 +89,11 @@ frp also offers a P2P connect mode.
     * [URL Routing](#url-routing)
     * [TCP Port Multiplexing](#tcp-port-multiplexing)
     * [Connecting to frps via PROXY](#connecting-to-frps-via-proxy)
+    * [Port range mapping](#port-range-mapping)
     * [Client Plugins](#client-plugins)
     * [Server Manage Plugins](#server-manage-plugins)
     * [SSH Tunnel Gateway](#ssh-tunnel-gateway)
+* [Releated Projects](#releated-projects)
 * [Contributing](#contributing)
 * [Donation](#donation)
     * [GitHub Sponsors](#github-sponsors)
@@ -350,7 +363,6 @@ You may substitute `https2https` for the plugin, and point the `localAddr` to a 
   # frpc.toml
   serverAddr = "x.x.x.x"
   serverPort = 7000
-  vhostHTTPSPort = 443
 
   [[proxies]]
   name = "test_https2http"
@@ -803,7 +815,7 @@ You can disable this feature by modify `frps.toml` and `frpc.toml`:
 
 ```toml
 # frps.toml and frpc.toml, must be same
-tcpMux = false
+transport.tcpMux = false
 ```
 
 ### Support KCP Protocol
@@ -982,7 +994,7 @@ The HTTP request will have the `Host` header rewritten to `Host: dev.example.com
 
 ### Setting other HTTP Headers
 
-Similar to `Host`, You can override other HTTP request headers with proxy type `http`.
+Similar to `Host`, You can override other HTTP request and response headers with proxy type `http`.
 
 ```toml
 # frpc.toml
@@ -994,15 +1006,16 @@ localPort = 80
 customDomains = ["test.example.com"]
 hostHeaderRewrite = "dev.example.com"
 requestHeaders.set.x-from-where = "frp"
+responseHeaders.set.foo = "bar"
 ```
 
-In this example, it will set header `x-from-where: frp` in the HTTP request.
+In this example, it will set header `x-from-where: frp` in the HTTP request and `foo: bar` in the HTTP response.
 
 ### Get Real IP
 
 #### HTTP X-Forwarded-For
 
-This feature is for http proxy only.
+This feature is for `http` proxies or proxies with the `https2http` and `https2https` plugins enabled.
 
 You can get user's real IP from HTTP request headers `X-Forwarded-For`.
 
@@ -1158,6 +1171,24 @@ serverPort = 7000
 transport.proxyURL = "http://user:pwd@192.168.1.128:8080"
 ```
 
+### Port range mapping
+
+*Added in v0.56.0*
+
+We can use the range syntax of Go template combined with the built-in `parseNumberRangePair` function to achieve port range mapping.
+
+The following example, when run, will create 8 proxies named `test-6000, test-6001 ... test-6007`, each mapping the remote port to the local port.
+
+```
+{{- range $_, $v := parseNumberRangePair "6000-6006,6007" "6000-6006,6007" }}
+[[proxies]]
+name = "tcp-{{ $v.First }}"
+type = "tcp"
+localPort = {{ $v.First }}
+remotePort = {{ $v.Second }}
+{{- end }}
+```
+
 ### Client Plugins
 
 frpc only forwards requests to local TCP or UDP ports by default.
@@ -1224,6 +1255,11 @@ frpc tcp --proxy_name "test-tcp" --local_ip 127.0.0.1 --local_port 8080 --remote
 ```
 
 Please refer to this [document](/doc/ssh_tunnel_gateway.md) for more information.
+
+## Releated Projects
+
+* [gofrp/plugin](https://github.com/gofrp/plugin) - A repository for frp plugins that contains a variety of plugins implemented based on the frp extension mechanism, meeting the customization needs of different scenarios.
+* [gofrp/tiny-frpc](https://github.com/gofrp/tiny-frpc) - A lightweight version of the frp client (around 3.5MB at minimum) implemented using the ssh protocol, supporting some of the most commonly used features, suitable for devices with limited resources.
 
 ## Contributing
 

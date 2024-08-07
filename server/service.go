@@ -22,9 +22,11 @@ import (
 	"io"
 	"net"
 	"net/http"
+	"os"
 	"strconv"
 	"time"
 
+	"github.com/fatedier/golib/crypto"
 	"github.com/fatedier/golib/net/mux"
 	fmux "github.com/hashicorp/yamux"
 	quic "github.com/quic-go/quic-go"
@@ -58,6 +60,16 @@ const (
 	connReadTimeout       time.Duration = 10 * time.Second
 	vhostReadWriteTimeout time.Duration = 30 * time.Second
 )
+
+func init() {
+	crypto.DefaultSalt = "frp"
+	// Disable quic-go's receive buffer warning.
+	os.Setenv("QUIC_GO_DISABLE_RECEIVE_BUFFER_WARNING", "true")
+	// Disable quic-go's ECN support by default. It may cause issues on certain operating systems.
+	if os.Getenv("QUIC_GO_DISABLE_ECN") == "" {
+		os.Setenv("QUIC_GO_DISABLE_ECN", "true")
+	}
+}
 
 // Server service
 type Service struct {
@@ -274,12 +286,13 @@ func NewService(cfg *v1.ServerConfig) (*Service, error) {
 
 		address := net.JoinHostPort(cfg.ProxyBindAddr, strconv.Itoa(cfg.VhostHTTPPort))
 		server := &http.Server{
-			Addr:    address,
-			Handler: rp,
+			Addr:              address,
+			Handler:           rp,
+			ReadHeaderTimeout: 60 * time.Second,
 		}
 		var l net.Listener
 		if httpMuxOn {
-			l = svr.muxer.ListenHttp(1)
+			l = svr.muxer.ListenHTTP(1)
 		} else {
 			l, err = net.Listen("tcp", address)
 			if err != nil {
@@ -296,7 +309,7 @@ func NewService(cfg *v1.ServerConfig) (*Service, error) {
 	if cfg.VhostHTTPSPort > 0 {
 		var l net.Listener
 		if httpsMuxOn {
-			l = svr.muxer.ListenHttps(1)
+			l = svr.muxer.ListenHTTPS(1)
 		} else {
 			address := net.JoinHostPort(cfg.ProxyBindAddr, strconv.Itoa(cfg.VhostHTTPSPort))
 			l, err = net.Listen("tcp", address)

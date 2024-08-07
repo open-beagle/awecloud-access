@@ -97,6 +97,9 @@ type HealthCheckConfig struct {
 	// Path specifies the path to send health checks to if the
 	// health check type is "http".
 	Path string `json:"path,omitempty"`
+	// HTTPHeaders specifies the headers to send with the health request, if
+	// the health check type is "http".
+	HTTPHeaders []HTTPHeader `json:"httpHeaders,omitempty"`
 }
 
 type DomainConfig struct {
@@ -124,6 +127,10 @@ func (c *ProxyBaseConfig) Complete(namePrefix string) {
 	c.Name = lo.Ternary(namePrefix == "", "", namePrefix+".") + c.Name
 	c.LocalIP = util.EmptyOr(c.LocalIP, "127.0.0.1")
 	c.Transport.BandwidthLimitMode = util.EmptyOr(c.Transport.BandwidthLimitMode, types.BandwidthLimitModeClient)
+
+	if c.Plugin.ClientPluginOptions != nil {
+		c.Plugin.ClientPluginOptions.Complete()
+	}
 }
 
 func (c *ProxyBaseConfig) MarshalToMsg(m *msg.NewProxy) {
@@ -190,6 +197,10 @@ func (c *TypedProxyConfig) UnmarshalJSON(b []byte) error {
 	}
 	c.ProxyConfigurer = configurer
 	return nil
+}
+
+func (c *TypedProxyConfig) MarshalJSON() ([]byte, error) {
+	return json.Marshal(c.ProxyConfigurer)
 }
 
 type ProxyConfigurer interface {
@@ -288,6 +299,7 @@ type HTTPProxyConfig struct {
 	HTTPPassword      string           `json:"httpPassword,omitempty"`
 	HostHeaderRewrite string           `json:"hostHeaderRewrite,omitempty"`
 	RequestHeaders    HeaderOperations `json:"requestHeaders,omitempty"`
+	ResponseHeaders   HeaderOperations `json:"responseHeaders,omitempty"`
 	RouteByHTTPUser   string           `json:"routeByHTTPUser,omitempty"`
 }
 
@@ -301,6 +313,7 @@ func (c *HTTPProxyConfig) MarshalToMsg(m *msg.NewProxy) {
 	m.HTTPUser = c.HTTPUser
 	m.HTTPPwd = c.HTTPPassword
 	m.Headers = c.RequestHeaders.Set
+	m.ResponseHeaders = c.ResponseHeaders.Set
 	m.RouteByHTTPUser = c.RouteByHTTPUser
 }
 
@@ -314,6 +327,7 @@ func (c *HTTPProxyConfig) UnmarshalFromMsg(m *msg.NewProxy) {
 	c.HTTPUser = m.HTTPUser
 	c.HTTPPassword = m.HTTPPwd
 	c.RequestHeaders.Set = m.Headers
+	c.ResponseHeaders.Set = m.ResponseHeaders
 	c.RouteByHTTPUser = m.RouteByHTTPUser
 }
 
