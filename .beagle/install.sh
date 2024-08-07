@@ -6,7 +6,7 @@ HTTP_SERVER="${HTTP_SERVER:-https://cache.wodcloud.com}"
 TARGET_ARCH="${TARGET_ARCH:-amd64}"
 
 # ACS版本
-ACC_VERSION="${ACC_VERSION:-v6.2.6}"
+ACC_VERSION="${ACC_VERSION:-v6.2.8}"
 
 LOCAL_KERNEL=$(uname -r | head -c 3)
 LOCAL_ARCH=$(uname -m)

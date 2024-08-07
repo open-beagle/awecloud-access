@@ -2,7 +2,6 @@ package net
 
 import (
 	"context"
-	"crypto/tls"
 	"net"
 	"net/url"
 
@@ -43,31 +42,6 @@ func DialHookWebsocket(protocol string, host string) libnet.AfterHookFunc {
 		}
 
 		conn, err := websocket.NewClient(cfg, c)
-		if err != nil {
-			return nil, nil, err
-		}
-		return ctx, conn, nil
-	}
-}
-
-func DialHookWSS() libdial.AfterHookFunc {
-	return func(ctx context.Context, c net.Conn, addr string) (context.Context, net.Conn, error) {
-		addr = "wss://" + addr + FrpWebsocketPath
-		uri, err := url.Parse(addr)
-		if err != nil {
-			return nil, nil, err
-		}
-
-		origin := "https://" + uri.Host
-		cfg, err := websocket.NewConfig(addr, origin)
-		if err != nil {
-			return nil, nil, err
-		}
-		cfg.TlsConfig = &tls.Config{
-			InsecureSkipVerify: true,
-		}
-
-		conn, err := websocket.DialConfig(cfg)
 		if err != nil {
 			return nil, nil, err
 		}
