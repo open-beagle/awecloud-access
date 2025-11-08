@@ -14,7 +14,7 @@
 
 package version
 
-var version = "6.2.8"
+var version = "unknown" // 默认版本，可通过编译时 -ldflags 覆盖
 
 func Full() string {
 	return version

@@ -73,8 +73,8 @@ type ClientCommonConfig struct {
 }
 
 func (c *ClientCommonConfig) Complete() {
-	c.ServerAddr = util.EmptyOr(c.ServerAddr, "0.0.0.0")
-	c.ServerPort = util.EmptyOr(c.ServerPort, 7000)
+	c.ServerAddr = util.EmptyOr(c.ServerAddr, "https://k8s.ali.wodcloud.com/awecloud/access/api")
+	c.ServerPort = util.EmptyOr(c.ServerPort, 443)
 	c.LoginFailExit = util.EmptyOr(c.LoginFailExit, lo.ToPtr(true))
 	c.NatHoleSTUNServer = util.EmptyOr(c.NatHoleSTUNServer, "stun.easyvoip.com:3478")
 

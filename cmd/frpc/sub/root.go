@@ -117,8 +117,14 @@ func handleTermSignal(svr *client.Service) {
 func runClient(cfgFilePath string) error {
 	cfg, proxyCfgs, visitorCfgs, isLegacyFormat, err := config.LoadClientConfig(cfgFilePath, strictConfigMode)
 
+	// 默认完整URL: "https://k8s.ali.wodcloud.com/awecloud/access/api"
+	const defaultServerURL = "https://k8s.ali.wodcloud.com/awecloud/access/api"
+
 	servAddr := cfg.ServerAddr
+
+	// 处理serverAddr的三种情况
 	if strings.HasPrefix(servAddr, "http") {
+		// 情况1: 完整的URL格式，直接覆盖默认值
 		servURL, err := url.Parse(servAddr)
 		if err != nil {
 			return err
@@ -143,6 +149,45 @@ func runClient(cfgFilePath string) error {
 		if servURL.Scheme == "https" {
 			cfg.Transport.Protocol = "wss"
 		}
+		if len(servURL.Path) > 0 {
+			unet.FrpWebsocketPath = servURL.Path
+		}
+	} else if strings.Contains(servAddr, ".") && !strings.Contains(servAddr, ":") && servAddr != "0.0.0.0" {
+		// 情况2: 只有域名格式，如 "k8s.ali.wodcloud.com"
+		// 使用默认URL的其他配置，只替换域名部分
+		defaultURL, err := url.Parse(defaultServerURL)
+		if err != nil {
+			return err
+		}
+
+		// 构建新的URL，使用默认的协议和路径，但替换域名
+		newURL := &url.URL{
+			Scheme: defaultURL.Scheme,
+			Host:   servAddr,
+			Path:   defaultURL.Path,
+		}
+
+		cfg.ServerAddr = newURL.Hostname()
+		if newURL.Scheme == "http" {
+			cfg.ServerPort = 80
+			cfg.Transport.Protocol = "ws"
+		}
+		if newURL.Scheme == "https" {
+			cfg.ServerPort = 443
+			cfg.Transport.Protocol = "wss"
+		}
+		if len(newURL.Path) > 0 {
+			unet.FrpWebsocketPath = newURL.Path
+		}
+	} else if servAddr == defaultServerURL {
+		// 情况3: 使用默认完整URL
+		servURL, err := url.Parse(defaultServerURL)
+		if err != nil {
+			return err
+		}
+		cfg.ServerAddr = servURL.Hostname()
+		cfg.ServerPort = 443
+		cfg.Transport.Protocol = "wss"
 		if len(servURL.Path) > 0 {
 			unet.FrpWebsocketPath = servURL.Path
 		}

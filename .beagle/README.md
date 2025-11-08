@@ -15,29 +15,31 @@ git merge v0.59.0
 ```bash
 # server
 docker run \
---rm \
--v $PWD/:/go/src/github.com/fatedier/frp \
--w /go/src/github.com/fatedier/frp \
-registry.cn-qingdao.aliyuncs.com/wod/golang:1.22-alpine \
-bash .beagle/server.build.sh
+  --rm \
+  -v $PWD/:/go/src/github.com/fatedier/frp \
+  -w /go/src/github.com/fatedier/frp \
+  -e BUILD_VERSION="v6.2.9" \
+  registry.cn-qingdao.aliyuncs.com/wod/golang:1.22-alpine \
+  bash .beagle/server.build.sh
 
 # start server
-$PWD/dist/awecloud-access-server-v6.2.8-linux-amd64 -c $PWD/.vscode/frps.ini
+$PWD/dist/awecloud-access-server-v6.2.9-linux-amd64 -c $PWD/.vscode/frps.ini
 
 # client
 docker run \
---rm \
--v $PWD/:/go/src/github.com/fatedier/frp \
--w /go/src/github.com/fatedier/frp \
-registry.cn-qingdao.aliyuncs.com/wod/golang:1.22-alpine \
-bash .beagle/client.build.sh
+  --rm \
+  -v $PWD/:/go/src/github.com/fatedier/frp \
+  -w /go/src/github.com/fatedier/frp \
+  -e BUILD_VERSION="v6.2.9" \
+  registry.cn-qingdao.aliyuncs.com/wod/golang:1.22-alpine \
+  bash .beagle/client.build.sh
 
 # start client
-$PWD/dist/awecloud-access-client-v6.2.8-linux-amd64 -c $PWD/.vscode/frpc.ini
+$PWD/dist/awecloud-access-client-v6.2.9-linux-amd64 -c $PWD/.vscode/frpc.ini
 
 # windows
 CGO_ENABLED=0 GOOS=windows GOARCH=amd64 \
-go build -o $PWD/dist/awecloud-access-client-v6.2.8.exe \
+go build -o $PWD/dist/awecloud-access-client-v6.2.9.exe \
 cmd/frpc/main.go
 ```
 
@@ -91,8 +93,8 @@ sudo curl -sfL https://cache.wodcloud.com/vscode/access/install.sh | bash -
 ```bash
 # install bin
 mkdir -p /opt/bin
-ln -s /etc/kubernetes/services/k8s-client/awecloud-access-client-v6.2.8-linux-amd64 /opt/bin/awecloud-access-client
-chmod +x /etc/kubernetes/services/k8s-client/awecloud-access-client-v6.2.8-linux-amd64
+ln -s /etc/kubernetes/services/k8s-client/awecloud-access-client-v6.2.9-linux-amd64 /opt/bin/awecloud-access-client
+chmod +x /etc/kubernetes/services/k8s-client/awecloud-access-client-v6.2.9-linux-amd64
 
 # install service
 systemctl enable k8s-client
@@ -160,5 +162,5 @@ git tag -d v0.6.2-beagle.8
 
 ```bash
 mc cp .beagle/install.sh cache/vscode/access/install.sh
-mc cp --recursive release/ cache/vscode/access/v6.2.8/
+mc cp --recursive release/ cache/vscode/access/v6.2.9/
 ```
