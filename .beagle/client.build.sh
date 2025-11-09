@@ -2,6 +2,8 @@
 
 set -ex
 
+git config --global --add safe.directory $PWD
+
 export CGO_ENABLED=0
 export BUILD_VERSION=${BUILD_VERSION:-v6.2.9}
 LDFLAGS="-s -w -X github.com/fatedier/frp/pkg/util/version.version=${BUILD_VERSION}"
