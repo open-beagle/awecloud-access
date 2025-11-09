@@ -19,7 +19,7 @@ docker run \
   -v $PWD/:/go/src/github.com/fatedier/frp \
   -w /go/src/github.com/fatedier/frp \
   -e BUILD_VERSION="v6.2.9" \
-  registry.cn-qingdao.aliyuncs.com/wod/golang:1.22-alpine \
+  registry.cn-qingdao.aliyuncs.com/wod/golang:1.24-alpine \
   bash .beagle/server.build.sh
 
 # start server
@@ -31,7 +31,7 @@ docker run \
   -v $PWD/:/go/src/github.com/fatedier/frp \
   -w /go/src/github.com/fatedier/frp \
   -e BUILD_VERSION="v6.2.9" \
-  registry.cn-qingdao.aliyuncs.com/wod/golang:1.22-alpine \
+  registry.cn-qingdao.aliyuncs.com/wod/golang:1.24-alpine \
   bash .beagle/client.build.sh
 
 # start client
@@ -50,7 +50,7 @@ cmd/frpc/main.go
 docker run -it --rm \
 -v $PWD/:/go/src/github.com/fatedier/frp \
 -w /go/src/github.com/fatedier/frp \
-registry.cn-qingdao.aliyuncs.com/wod/golang:1.22-alpine \
+registry.cn-qingdao.aliyuncs.com/wod/golang:1.24-alpine \
 rm -rf vendor && go mod tidy && go mod vendor
 
 # 构建缓存-->推送缓存至服务器

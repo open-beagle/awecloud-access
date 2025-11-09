@@ -1,0 +1,73 @@
+name: Build Main Images
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch: # 允许手动触发
+
+env:
+  BUILD_VERSION: v6.2.9
+
+jobs:
+  build:
+    name: Build Images
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Login to Aliyun Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: registry.cn-qingdao.aliyuncs.com
+          username: ${{ secrets.REGISTRY_USER_ALIYUN }}
+          password: ${{ secrets.REGISTRY_PASSWORD_ALIYUN }}
+
+      - name: Cross Build
+        run: |
+          docker run --rm -v ${{ github.workspace }}:/go/src/github.com/fatedier/frp \
+            -w /go/src/github.com/fatedier/frp \
+            -e BUILD_VERSION=${{ env.BUILD_VERSION }} \
+            ghcr.io/${{ github.repository_owner }}/golang:1.24-alpine \
+            bash -c "bash ./.beagle/client.build.sh && bash ./.beagle/server.build.sh"
+
+      - name: Set new env var
+        id: set_new_env_var
+        run: |
+          echo "BUILD_VERSION_RELEASE=${BUILD_VERSION%.*}" >> $GITHUB_ENV
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Create Server release tags
+        run: |
+          docker buildx imagetools create -t registry.cn-qingdao.aliyuncs.com/wod/awecloud-access-server:${{ env.BUILD_VERSION_RELEASE }} \
+            registry.cn-qingdao.aliyuncs.com/wod/awecloud-access-server:${{ env.BUILD_VERSION }}-amd64 \
+            registry.cn-qingdao.aliyuncs.com/wod/awecloud-access-server:${{ env.BUILD_VERSION }}-arm64
+          docker buildx imagetools create -t registry.cn-qingdao.aliyuncs.com/wod/awecloud-access-server:${{ env.BUILD_VERSION_RELEASE }}-amd64 \
+            registry.cn-qingdao.aliyuncs.com/wod/awecloud-access-server:${{ env.BUILD_VERSION }}-amd64
+          docker buildx imagetools create -t registry.cn-qingdao.aliyuncs.com/wod/awecloud-access-server:${{ env.BUILD_VERSION_RELEASE }}-arm64 \
+            registry.cn-qingdao.aliyuncs.com/wod/awecloud-access-server:${{ env.BUILD_VERSION }}-arm64
+
+      - name: Create Client release tags
+        run: |
+          docker buildx imagetools create -t registry.cn-qingdao.aliyuncs.com/wod/awecloud-access-client:${{ env.BUILD_VERSION_RELEASE }} \
+            registry.cn-qingdao.aliyuncs.com/wod/awecloud-access-client:${{ env.BUILD_VERSION }}-amd64 \
+            registry.cn-qingdao.aliyuncs.com/wod/awecloud-access-client:${{ env.BUILD_VERSION }}-arm64
+          docker buildx imagetools create -t registry.cn-qingdao.aliyuncs.com/wod/awecloud-access-client:${{ env.BUILD_VERSION_RELEASE }}-amd64 \
+            registry.cn-qingdao.aliyuncs.com/wod/awecloud-access-client:${{ env.BUILD_VERSION }}-amd64
+          docker buildx imagetools create -t registry.cn-qingdao.aliyuncs.com/wod/awecloud-access-client:${{ env.BUILD_VERSION_RELEASE }}-arm64 \
+            registry.cn-qingdao.aliyuncs.com/wod/awecloud-access-client:${{ env.BUILD_VERSION }}-arm64
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ env.BUILD_VERSION }}
+          name: Release ${{ env.BUILD_VERSION }}
+          draft: false
+          prerelease: false
+          files: |
+            release/*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
