@@ -2,12 +2,12 @@ ARG BASE
 
 FROM $BASE
 
-ARG AUTHOR
-ARG VERSION
+ARG AUTHOR=mengkzhaoyun@gmail.com
+ARG VERSION=v6.2.9
 LABEL maintainer=$AUTHOR version=$VERSION
 
-ARG TARGETOS
-ARG TARGETARCH
+ARG TARGETOS=linux
+ARG TARGETARCH=amd64
 
 COPY ./release/awecloud-access-client-$VERSION-$TARGETOS-$TARGETARCH /app/awecloud-access-client
 COPY ./build/client.conf.ini /etc/awecloud/conf.ini
