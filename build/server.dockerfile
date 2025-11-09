@@ -4,6 +4,8 @@ FROM $BASE
 
 ARG AUTHOR=mengkzhaoyun@gmail.com
 ARG VERSION=v6.2.9
+ARG TARGETOS
+ARG TARGETARCH
 LABEL maintainer=$AUTHOR version=$VERSION
 
 ENV BIND_SOCKET_PATH=/awecloud/access/api
