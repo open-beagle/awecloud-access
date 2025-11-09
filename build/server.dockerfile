@@ -1,13 +1,10 @@
-ARG BASE
+ARG BASE=alpine:3
 
 FROM $BASE
 
 ARG AUTHOR=mengkzhaoyun@gmail.com
 ARG VERSION=v6.2.9
 LABEL maintainer=$AUTHOR version=$VERSION
-
-ARG TARGETOS=linux
-ARG TARGETARCH=amd64
 
 ENV BIND_SOCKET_PATH=/awecloud/access/api
 
